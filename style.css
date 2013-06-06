@@ -1,0 +1,8 @@
+.pane {
+	visibility: none;
+}
+
+/* in the future have a loading spinner */
+#login-pane {
+	visibility: visible;
+}

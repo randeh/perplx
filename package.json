@@ -1,0 +1,12 @@
+{
+  "name": "puzzle-game",
+  "description": "Some description",
+  "author": "Ryan and Lewis Jackson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/randeh/puzzle-game.git"
+  },
+  "dependencies": {
+    "websocket": "1.0.8"
+  }
+}

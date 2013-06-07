@@ -2,7 +2,6 @@
 	visibility: none;
 }
 
-/* in the future have a loading spinner */
-#login-pane {
+#loading-pane {
 	visibility: visible;
 }

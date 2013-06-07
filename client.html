@@ -3,10 +3,14 @@
 <head>
   <title>Puzzle Game</title>
   <meta charset="UTF-8" />
+  <script src="validate.js"></script>
   <script src="client.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
+  <div class="pane" id="loading-pane">
+    <img src="images/loading-spinner.gif" />
+  </div>
   <div class="pane" id="login-pane">
     <h1>Log in</h1>
     Username: <input type="text" id="login-username" /><br />

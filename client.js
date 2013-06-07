@@ -1,6 +1,8 @@
 "use strict";
 
 window.addEventListener("load", function(event) {
+  var loadingPane = document.getElementById("loading-pane");
+
   var loginPane = document.getElementById("login-pane");
   var loginUsername = document.getElementById("login-username");
   var loginPassword = document.getElementById("login-password");
@@ -20,12 +22,16 @@ window.addEventListener("load", function(event) {
   var socket = new WebSocket("ws://localhost:8080");
 
   loginButton.addEventListener("click", function(event) {
-    var username = loginUsername.value;
-    var password = loginPassword.value;
-    loginUsername.value = "";
-    loginPassword.value = "";
-    // send login attempt to server
-    socket.send(username + " " + password);
+    var query = {
+      category: "account",
+      activity: "login",
+      username: loginUsername.value,
+      password: loginPassword.value
+    };
+    var queryString = JSON.stringify(query);
+    socket.send(queryString);
+    loginPane.style.visibility = "none";
+    loadingPane.style.visibility = "visible";
   });
 
   loginRegister.addEventListener("click", function(event) {
@@ -44,9 +50,47 @@ window.addEventListener("load", function(event) {
     // send register attempt to server
   });
 
+  socket.addEventListener("open", function(event) {
+    // Display login screen once the socket is open
+    loadingPane.style.visibility = "none";
+    loginPane.style.visibility = "visible";
+  });
+
   socket.addEventListener("message", function(event) {
-    alert(event.data);
-  })
+    loadingPane.style.visibility = "none";
+    var response = JSON.parse(event.data);
+    switch(response.category) {
+      case "account":
+        switch(response.activity) {
+          case "login":
+            if(response.success) {
+              // Clear the fields to prevent re-logging in after log out
+              loginUsername.value = "";
+              loginPassword.value = "";
+              homePane.style.visibility = "visible";
+              homeUsername.textContent = response.username;
+            } else {
+              loginPassword.value = "";
+            }
+            break;
+          default:
+            break;
+        }
+        break;
+      default:
+        break;
+    }
+  });
+
+  socket.addEventListener("error", function(event) {
+    alert("WebSocket Error: " + error);
+  });
+
+  socket.addEventListener("close", function(event) {
+    // hide all panes
+    // JQuery: $(".pane").hide();
+    loadingPane.style.visibility = "visible";
+  });
 
 });
 

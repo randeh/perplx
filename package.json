@@ -7,6 +7,7 @@
     "url": "https://github.com/randeh/puzzle-game.git"
   },
   "dependencies": {
-    "websocket": "1.0.8"
+    "websocket": "1.0.8",
+    "jquery": "1.8.3"
   }
 }

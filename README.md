@@ -6,4 +6,4 @@ npm install
 node server.js
 ```
 
-A client can then be started by opening client.html.
+A client can then be started by opening client/index.html.

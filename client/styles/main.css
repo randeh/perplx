@@ -1,0 +1,7 @@
+.pane .register-tip {
+	display: none;
+}
+
+#loading-pane {
+	display: block;
+}

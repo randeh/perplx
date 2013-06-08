@@ -1,8 +1,5 @@
 "use strict";
 
-var registerSuccess;
-var registerFailure;
-
 // Add functionality to check name availability
 
 $(document).ready(function(event) {
@@ -48,12 +45,12 @@ $(document).ready(function(event) {
       password: $("#register-password").val()
     };
     var queryString = JSON.stringify(query);
-    socket.send(queryString);
+    messageServer(queryString);
     $("#register-pane").hide();
     $("#loading-pane").show();
   });
 
-  registerSuccess = function(data) {
+  callbacks.registerSuccess = function(data) {
     $("#register-username").val("");
     $("#register-email").val("");
     $("#register-password").val("");
@@ -62,7 +59,7 @@ $(document).ready(function(event) {
     $("#home-username").text(data.username);
   };
 
-  registerFailure = function(data) {
+  callbacks.registerFailure = function(data) {
     // re-validate and colour fields/submit button
     $("#register-pane").show();
     alert(data.message);

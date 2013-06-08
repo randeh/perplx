@@ -1,8 +1,5 @@
 "use strict";
 
-var loginSuccess;
-var loginFailure;
-
 $(document).ready(function(event) {
 
   $("#login-button").click(function(event) {
@@ -12,7 +9,7 @@ $(document).ready(function(event) {
       password: $("#login-password").val()
     };
     var queryString = JSON.stringify(query);
-    socket.send(queryString);
+    messageServer(queryString);
     $("#login-pane").hide();
     $("#loading-pane").show();
   });
@@ -25,14 +22,14 @@ $(document).ready(function(event) {
     event.preventDefault();
   });
 
-  loginSuccess = function(data) {
+  callbacks.loginSuccess = function(data) {
     $("#login-username").val("");
     $("#login-password").val("");
     $("#home-pane").show();
     $("#home-username").text(data.username);
   };
 
-  loginFailure = function(data) {
+  callbacks.loginFailure = function(data) {
     $("#login-password").val("");
     $("#login-pane").show();
     $("#login-password").focus();

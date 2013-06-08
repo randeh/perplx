@@ -1,10 +1,11 @@
 "use strict";
 
-var socket;
+var messageServer;
+var callbacks;
 
 $(document).ready(function(event) {
 
-  socket = new WebSocket("ws://localhost:8080");
+  var socket = new WebSocket("ws://localhost:8080");
 
   socket.addEventListener("open", function(event) {
     // Display login screen once the socket is open
@@ -19,7 +20,7 @@ $(document).ready(function(event) {
     if(!response.hasOwnProperty("callback") || typeof window[response.callback] !== 'function') {
       displayError("Unexpected response");
     } else {
-      window[response.callback](response.data);
+      callbacks[response.callback](response.data);
     }
   });
 
@@ -31,10 +32,15 @@ $(document).ready(function(event) {
     displayError("WebSocket closed");
   });
 
-  displayError = function(message){
+  displayError = function(message) {
     $(".pane").hide();
     $("#loading-pane").show();
     alert(message);
+  };
+
+  messageServer = function(message) {
+    // Add session id?
+    socket.send(message);
   };
 
 });

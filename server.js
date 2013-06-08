@@ -1,6 +1,7 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 
+var accounts = [];
 var clients = [];
 
 var server = http.createServer(function(request, response) {
@@ -14,45 +15,75 @@ server.listen(8080, function() {
 
 wsServer = new WebSocketServer({
     httpServer: server,
-    // You should not use autoAcceptConnections for production
-    // applications, as it defeats all standard cross-origin protection
-    // facilities built into the protocol and the browser.  You should
-    // *always* verify the connection's origin and decide whether or not
-    // to accept it.
     autoAcceptConnections: false
 });
 
 function originIsAllowed(origin) {
-  // put logic here to detect whether the specified origin is allowed.
   return true;
 }
 
 wsServer.on('request', function(request) {
     if (!originIsAllowed(request.origin)) {
-      // Make sure we only accept requests from an allowed origin
       request.reject();
       console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
       return;
     }
 
     var connection = request.accept(null, request.origin);
-    var index = clients.push(connection) - 1;
     console.log((new Date()) + ' Connection accepted.');
 
     connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
-            for(var i=0; i<clients.length; i++) {
-                clients[i].sendUTF(message.utf8Data);
-            }
+        if (message.type !== 'utf8') {
+            // Received message in unsupported format
         }
-        else if (message.type === 'binary') {
-            console.log('Received Binary Message: ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
+        var data = JSON.parse(message.utf8Data);
+        var activity = data.activity;
+        delete data.activity;
+        if(data.hasOwnProperty("session")) {
+            // check session is valid first
+            if(activity === 'blah') {
+                //
+            } else if(activity === 'blah') {
+                //
+            } else {
+                // Unexpected activity
+            }
+        } else {
+            var response;
+            if(activity === 'register') {
+                // Validate using require("client/js/validate")
+                var account = {
+                    username: data.username,
+                    email: data.email,
+                    password: data.password
+                };
+                accounts.push(account);
+                response = {
+                    callback: "registerSuccess",
+                    data: {
+                        username: data.username
+                    }
+                };
+            } else if(activity === 'login') {
+                //
+            } else if(activity === '') {
+                // check name availability
+            } else {
+                // Unexpected activity
+            }
+            var responseString = JSON.stringify(response);
+            connection.sendUTF(responseString);
         }
     });
     connection.on('close', function(reasonCode, description) {
-        clients.splice(index, 1);
+        var i;
+        for(i=0; i<clients.length; i++)
+        {
+            if(clients[i] === connection) {
+                break;
+            }
+        }
+        clients.splice(i, 1);
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });

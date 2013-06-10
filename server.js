@@ -62,10 +62,31 @@ wsServer.on('request', function(request) {
                     callback: "registerSuccess",
                     data: {
                         username: data.username
+                        // generate and send session id
                     }
                 };
             } else if(activity === 'login') {
-                //
+                var foundUsername = false;
+                for(var i=0; i<accounts.length; i++) {
+                    if(accounts[i].username === data.username) {
+                        foundUsername = true;
+                        if(accounts[i].password === data.password) {
+                            response = {
+                                callback: "loginSuccess",
+                                data: {
+                                    username: data.username
+                                    // generate and send session id
+                                }
+                            };
+                        } else {
+                            // invalid password
+                        }
+                        break;
+                    }
+                }
+                if(!foundUsername) {
+                    // invalid username
+                }
             } else if(activity === '') {
                 // check name availability
             } else {
@@ -76,14 +97,13 @@ wsServer.on('request', function(request) {
         }
     });
     connection.on('close', function(reasonCode, description) {
-        var i;
-        for(i=0; i<clients.length; i++)
+        for(var i=0; i<clients.length; i++)
         {
             if(clients[i] === connection) {
+                clients.splice(i, 1);
                 break;
             }
         }
-        clients.splice(i, 1);
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });

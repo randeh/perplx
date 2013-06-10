@@ -1,4 +1,4 @@
-.pane .register-tip {
+.pane, .register-tip {
 	display: none;
 }
 

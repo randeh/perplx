@@ -3,19 +3,17 @@
 $(document).ready(function(event) {
 
   $("#login-button").click(function(event) {
-    var message = {
-      activity: "login",
+    var data = {
       username: $("#login-username").val(),
       password: $("#login-password").val()
     };
-    messageServer(message);
+    messageServer("login", data);
     $("#login-pane").hide();
     $("#loading-pane").show();
   });
 
   $("#login-register").click(function(event) {
-    $("#login-username").val("");
-    $("#login-password").val("");
+    $(".login-field").val("");
     $("#login-pane").hide();
     $("#register-pane").show();
     event.preventDefault();
@@ -24,10 +22,9 @@ $(document).ready(function(event) {
 });
 
 callbacks.loginSuccess = function(data) {
-  $("#login-username").val("");
-  $("#login-password").val("");
-  sessionId = data.session;
-  // TODO: also save session as a cookie
+  $(".field").val("");
+  // TODO: re-validate register form (i.e. clear error messages)
+  localStorage.session = data.session;
   $("#home-username").text(data.username);
   $("#home-pane").show();
 };
@@ -36,5 +33,5 @@ callbacks.loginFailure = function(data) {
   $("#login-password").val("");
   $("#login-pane").show();
   $("#login-password").focus();
-  alert(data.message);
+  alert(data.message); // TEMP
 };

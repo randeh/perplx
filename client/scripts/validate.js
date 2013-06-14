@@ -1,13 +1,13 @@
 "use strict";
 
-function isValidUsername(username) {
+var isValidUsername = function(username) {
 	return true;
 }
 
-function isValidPassword(password) {
+var isValidPassword = function(password) {
 	return true;
 }
 
-function isValidEmail(email) {
+var isValidEmail = function(email) {
 	return true;
 }

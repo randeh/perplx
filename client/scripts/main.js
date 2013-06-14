@@ -1,6 +1,5 @@
 "use strict";
 
-var sessionId;
 var callbacks = {};
 
 $(document).ready(function(event) {
@@ -8,21 +7,27 @@ $(document).ready(function(event) {
   var socket = new WebSocket("ws://localhost:8080");
 
   socket.addEventListener("open", function(event) {
-    // TODO if we're already logged in, go to the home screen?
-    //      check session cookie and send to server to be checked
-    //      is this unsecure? providing a method to check if session ids are valid?
-    // Display login screen once the socket is open
-    $("#loading-pane").hide();
-    $("#login-pane").show();
+    if(localStorage.session === undefined) {
+      // No existing session, go to login screen
+      $("#loading-pane").hide();
+      $("#login-pane").show();
+    } else {
+      // Check if stored session is still valid
+      var data = {
+        session: localStorage.session
+      };
+      localStorage.session = undefined;
+      messageServer("checkSession", data);
+    }
   });
 
   socket.addEventListener("message", function(event) {
     $("#loading-pane").hide();
     var response = JSON.parse(event.data);
-    if(!response.hasOwnProperty("callback")) {
+    if(!response.hasOwnProperty("action")) {
       displayError("Unexpected response");
     } else {
-      callbacks[response.callback](response.data);
+      callbacks[response.action](response.data);
     }
   });
 
@@ -36,16 +41,26 @@ $(document).ready(function(event) {
 
 });
 
+callbacks.sessionInvalid = function(data) {
+  // Stored session is invalid, go to login screen
+  $("#loading-pane").hide();
+  $("#login-pane").show();
+}
+
 var displayError = function(message) {
   $(".pane").hide();
   $("#loading-pane").show();
   alert(message);
 };
 
-var messageServer = function(message) {
-  if(sessionId !== undefined) {
-    message.session = sessionId;
+var messageServer = function(action, data) {
+  var message = {
+    action: action,
+    data: data
+  };
+  if(localStorage.session !== undefined) {
+    message.session = localStorage.session;
   }
-  var data = JSON.stringify(message);
-  socket.send(data);
+  var messageString = JSON.stringify(message);
+  socket.send(messageString);
 };

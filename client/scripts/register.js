@@ -46,30 +46,20 @@ $(document).ready(function(event) {
   // ^ also enable/disable register button as form is completed
 
   $("#register-button").click(function(event) {
-    var message = {
-      activity: "register",
+    var data = {
       username: $("#register-username").val(),
       email: $("#register-email").val(),
       password: $("#register-password").val()
     };
-    messageServer(message);
+    messageServer("register", data);
     $("#register-pane").hide();
     $("#loading-pane").show();
   });
 
 });
 
-callbacks.registerSuccess = function(data) {
-  $("#register-username").val("");
-  $("#register-email").val("");
-  $("#register-password").val("");
-  $("#register-password2").val("");
-  $("#home-pane").show();
-  $("#home-username").text(data.username);
-};
-
 callbacks.registerFailure = function(data) {
-  // re-validate and colour fields/submit button
+  // re-validate form
   $("#register-pane").show();
-  alert(data.message);
+  alert(data.message); // TEMP
 };

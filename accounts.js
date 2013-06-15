@@ -8,8 +8,7 @@
   var clients = [];
 
   module.exports.removeClient = function(connection) {
-    for(var i=0; i<clients.length; i++)
-    {
+    for(var i=0; i<clients.length; i++) {
       if(clients[i] === connection) {
         clients.splice(i, 1);
         break;
@@ -46,11 +45,11 @@
     account.session = session;
     connection.session = session;
     clients.push(connection);
-    var data: {
+    var data = {
       username: account.username,
       session: session
     };
-    messageClient(connection, "loginSuccess", data)
+    module.exports.messageClient(connection, "loginSuccess", data)
   };
 
   module.exports.register = function(connection, data) {
@@ -85,7 +84,7 @@
         return;
       }
     }
-    messageClient(connection, "sessionInvalid", {});
+    module.exports.messageClient(connection, "sessionInvalid", {});
   };
 
 }());

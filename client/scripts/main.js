@@ -1,6 +1,7 @@
 "use strict";
 
 var callbacks = {};
+var messageServer;
 
 $(document).ready(function(event) {
 
@@ -16,7 +17,7 @@ $(document).ready(function(event) {
       var data = {
         session: localStorage.session
       };
-      localStorage.session = undefined;
+      delete localStorage.session;
       messageServer("checkSession", data);
     }
   });
@@ -39,6 +40,18 @@ $(document).ready(function(event) {
     displayError("WebSocket closed");
   });
 
+  messageServer = function(action, data) {
+    var message = {
+      action: action,
+      data: data
+    };
+    if(localStorage.session !== undefined) {
+      message.session = localStorage.session;
+    }
+    var messageString = JSON.stringify(message);
+    socket.send(messageString);
+  };
+
 });
 
 callbacks.sessionInvalid = function(data) {
@@ -51,16 +64,4 @@ var displayError = function(message) {
   $(".pane").hide();
   $("#loading-pane").show();
   alert(message);
-};
-
-var messageServer = function(action, data) {
-  var message = {
-    action: action,
-    data: data
-  };
-  if(localStorage.session !== undefined) {
-    message.session = localStorage.session;
-  }
-  var messageString = JSON.stringify(message);
-  socket.send(messageString);
 };

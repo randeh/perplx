@@ -1,6 +1,7 @@
 var WebSocketServer = require("websocket").server;
 var http = require("http");
 var accounts = require("./accounts");
+var clients = require("./clients");
 
 var server = http.createServer(function(request, response) {
   console.log((new Date()) + " Received request for " + request.url);
@@ -71,7 +72,7 @@ wsServer.on("request", function(request) {
 
   connection.on("close", function(reasonCode, description) {
     if(connection.session !== undefined) {
-      accounts.removeClient(connection);
+      clients.removeClient(connection);
     }
     console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
   });

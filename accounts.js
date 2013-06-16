@@ -3,56 +3,19 @@
 (function() {
 
   var crypto = require("crypto");
-  var accounts = [];
-  var clients = [];
-  var databaseUrl = "puzzle-game"; // "username:password@example.com/mydb"
-  var collections = ["users"]
-  var db = require("mongojs").connect(databaseUrl, collections);
-
-  module.exports.removeClient = function(connection) {
-    for(var i=0; i<clients.length; i++) {
-      if(clients[i] === connection) {
-        clients.splice(i, 1);
-        break;
-      }
-    }
-  };
-
-  module.exports.messageClient = function(connection, action, data) {
-    var message = {
-      action: action,
-      data: data
-    };
-    var messageString = JSON.stringify(message);
-    connection.sendUTF(messageString);
-  };
-
-  module.exports.messageAll = function(action, data) {
-    var message = {
-      action: action,
-      data: data
-    };
-    var messageString = JSON.stringify(message);
-    for(var i=0; i<clients.length; i++) {
-      clients[i].sendUTF(messageString);
-    }
-  };
-
-  var generateSession = function() {
-    return crypto.randomBytes(48).toString("hex");
-  };
+  var db = require("./database");
+  var clients = require("./clients");
 
   var login = function(connection, account) {
-    var session = generateSession();
-    account.session = session;
-    account.bum = "poo";
+    var session = crypto.randomBytes(48).toString("hex");
+    account.session = session; // TODO need to alter database for this
     connection.session = session;
-    clients.push(connection);
+    clients.addClient(connection);
     var data = {
       username: account.username,
       session: session
     };
-    module.exports.messageClient(connection, "loginSuccess", data)
+    clients.messageClient(connection, "loginSuccess", data)
   };
 
   module.exports.register = function(connection, data) {
@@ -62,48 +25,51 @@
       email: data.email,
       password: data.password // TODO hash this
     };
-    accounts.push(account);
-    db.users.save(account, function(err, saved) {
-      if( err || !saved ) console.log("User not saved");
-      else console.log("User saved");
+    // TODO Make sure an account doesn;t already exist with this username/email
+    db.accounts.save(account, function(err, saved) {
+      if(err || !saved) {
+        console.log("Account not saved");
+        // TODO Send register failure message
+      } else {
+        console.log("Account saved");
+        login(connection, account);
+      }
     });
-    login(connection, account);
   };
 
   module.exports.login = function(connection, data) {
-    for(var i=0; i<accounts.length; i++) {
-      if(accounts[i].username === data.username) {
-        if(accounts[i].password === data.password) {
-          login(connection, accounts[i]);
-        } else {
-          // TODO invalid password
-        }
-        return;
+    var query = {
+      username: data.username,
+      password: data.password
+    };
+    db.accounts.findOne(query, function(err, account) {
+      if(err) {
+        //
+      } else if(!account) {
+        // TODO invalid username and/or password
+      } else {
+        login(connection, account);
       }
-    }
-    // TODO invalid username
+    });
   };
 
   module.exports.checkSession = function(connection, data) {
-    for(var i=0; i<accounts.length; i++) {
-      if(accounts[i].session === data.session) {
-        login(connection, accounts[i]);
-        return;
+    db.accounts.findOne({ session: data.session }, function(err, account) {
+      if(err) {
+        // 
+      } else if(!account) {
+        clients.messageClient(connection, "sessionInvalid", {});
+      } else {
+        login(connection, account);
       }
-    }
-    module.exports.messageClient(connection, "sessionInvalid", {});
+    });
   };
 
   module.exports.logout = function(connection, data) {
-    module.exports.removeClient(connection);
-    for(var i=0; i<accounts.length; i++) {
-      if(accounts[i].session === connection.session) {
-        delete accounts[i].session;
-        break;
-      }
-    }
+    clients.removeClient(connection);
+    db.accounts.update({ session: connection.session }, { $unset: { session: 1 } });
     delete connection.session;
-    module.exports.messageClient(connection, "logoutSuccess", {});
+    clients.messageClient(connection, "logoutSuccess", {});
   };
 
 }());

@@ -44,8 +44,8 @@ wsServer.on("request", function(request) {
         // Session is wrong for this connection
       }
       switch(action) {
-        case "blah":
-          //
+        case "logout":
+          accounts.logout(connection, data);
           break;
         default:
           // Unexpected action
@@ -70,7 +70,9 @@ wsServer.on("request", function(request) {
   });
 
   connection.on("close", function(reasonCode, description) {
-    accounts.removeClient(connection);
+    if(connection.session !== undefined) {
+      accounts.removeClient(connection);
+    }
     console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
   });
 

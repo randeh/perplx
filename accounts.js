@@ -87,4 +87,16 @@
     module.exports.messageClient(connection, "sessionInvalid", {});
   };
 
+  module.exports.logout = function(connection, data) {
+    module.exports.removeClient(connection);
+    for(var i=0; i<accounts.length; i++) {
+      if(accounts[i].session === connection.session) {
+        delete accounts[i].session;
+        break;
+      }
+    }
+    delete connection.session;
+    module.exports.messageClient(connection, "logoutSuccess", {});
+  };
+
 }());

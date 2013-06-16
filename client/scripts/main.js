@@ -23,7 +23,8 @@ $(document).ready(function(event) {
   });
 
   socket.addEventListener("message", function(event) {
-    $("#loading-pane").hide();
+    $("#loading-pane").hide(); // TODO remove this from other places
+    alert(event.data);
     var response = JSON.parse(event.data);
     if(!response.hasOwnProperty("action")) {
       displayError("Unexpected response");
@@ -49,6 +50,7 @@ $(document).ready(function(event) {
       message.session = localStorage.session;
     }
     var messageString = JSON.stringify(message);
+    alert(messageString);
     socket.send(messageString);
   };
 

@@ -3,9 +3,11 @@
 (function() {
 
   var crypto = require("crypto");
-
   var accounts = [];
   var clients = [];
+  var databaseUrl = "puzzle-game"; // "username:password@example.com/mydb"
+  var collections = ["users"]
+  var db = require("mongojs").connect(databaseUrl, collections);
 
   module.exports.removeClient = function(connection) {
     for(var i=0; i<clients.length; i++) {
@@ -43,6 +45,7 @@
   var login = function(connection, account) {
     var session = generateSession();
     account.session = session;
+    account.bum = "poo";
     connection.session = session;
     clients.push(connection);
     var data = {
@@ -60,6 +63,10 @@
       password: data.password // TODO hash this
     };
     accounts.push(account);
+    db.users.save(account, function(err, saved) {
+      if( err || !saved ) console.log("User not saved");
+      else console.log("User saved");
+    });
     login(connection, account);
   };
 

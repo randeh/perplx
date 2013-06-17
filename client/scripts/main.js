@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO maybe rename this to be socket.js
+
 var callbacks = {};
 var messageServer;
 
@@ -23,8 +25,6 @@ $(document).ready(function(event) {
   });
 
   socket.addEventListener("message", function(event) {
-    $("#loading-pane").hide(); // TODO remove this from other places
-    alert(event.data);
     var response = JSON.parse(event.data);
     if(!response.hasOwnProperty("action")) {
       displayError("Unexpected response");
@@ -50,7 +50,6 @@ $(document).ready(function(event) {
       message.session = localStorage.session;
     }
     var messageString = JSON.stringify(message);
-    alert(messageString);
     socket.send(messageString);
   };
 
@@ -58,10 +57,12 @@ $(document).ready(function(event) {
 
 callbacks.sessionInvalid = function(data) {
   // Stored session is invalid, go to login screen
-  $("#loading-pane").hide();
+  delete localStorage.session;
+  $(".pane").hide();
   $("#login-pane").show();
 }
 
+// TODO maybe make this a callback, call it callbacks.fatalError
 var displayError = function(message) {
   $(".pane").hide();
   $("#loading-pane").show();

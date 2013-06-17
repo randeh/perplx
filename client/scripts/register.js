@@ -61,5 +61,5 @@ $(document).ready(function(event) {
 callbacks.registerFailure = function(data) {
   // re-validate form
   $("#register-pane").show();
-  alert(data.message); // TEMP
+  alert(JSON.stringify(data)); // TEMP
 };

@@ -33,5 +33,5 @@ callbacks.loginFailure = function(data) {
   $("#login-password").val("");
   $("#login-pane").show();
   $("#login-password").focus();
-  alert(data.message); // TEMP
+  alert(JSON.stringify(data));
 };

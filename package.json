@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "websocket": "1.0.8",
-    "mongojs": "0.7.5"
+    "mongojs": "0.7.5",
+    "bcrypt": "0.7.6"
   }
 }

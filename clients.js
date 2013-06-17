@@ -5,20 +5,26 @@
   var clients = [];
 
   module.exports.addClient = function(connection) {
-    console.log("Adding client " + clients.length);
     clients.push(connection);
-    console.log("Added client " + clients.length);
-  }
+  };
 
   module.exports.removeClient = function(connection) {
-    console.log("Removing client " + clients.length);
     for(var i=0; i<clients.length; i++) {
       if(clients[i] === connection) {
         clients.splice(i, 1);
         break;
       }
     }
-    console.log("Removed client " + clients.length);
+  };
+
+  module.exports.logoutSession = function(session) {
+    for(var i=0; i<clients.length; i++) {
+      if(clients[i].session === session) {
+        delete clients[i].session;
+        module.exports.messageClient(clients[i], "sessionInvalid", {});
+        break;
+      }
+    }
   };
 
   module.exports.messageClient = function(connection, action, data) {

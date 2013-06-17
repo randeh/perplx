@@ -43,6 +43,7 @@ wsServer.on("request", function(request) {
       var session = messageContent.session;
       if(session !== connection.session) {
         // Session is wrong for this connection
+        clients.messageClient(connection, "sessionInvalid", {});
       }
       switch(action) {
         case "logout":

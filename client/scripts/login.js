@@ -22,6 +22,7 @@ $(document).ready(function(event) {
 });
 
 callbacks.loginSuccess = function(data) {
+  $("#loading-pane").hide();
   $(".field").val("");
   // TODO: re-validate register form (i.e. clear error messages)
   localStorage.session = data.session;
@@ -30,6 +31,7 @@ callbacks.loginSuccess = function(data) {
 };
 
 callbacks.loginFailure = function(data) {
+  $("#loading-pane").hide();
   $("#login-password").val("");
   $("#login-pane").show();
   $("#login-password").focus();

@@ -1,13 +1,17 @@
 "use strict";
 
-var isValidUsername = function(username) {
-  return true;
-}
+(function(exports) {
 
-var isValidPassword = function(password) {
-  return true;
-}
+  exports.isValidUsername = function(username) {
+    return true;
+  }
 
-var isValidEmail = function(email) {
-  return true;
-}
+  exports.isValidPassword = function(password) {
+    return true;
+  }
+
+  exports.isValidEmail = function(email) {
+    return true;
+  }
+
+}(typeof exports === undefined ? this.validate = {} : exports));

@@ -21,15 +21,15 @@ $(document).ready(function(event) {
 /*
   // TODO In the future, perform this validation as the form is filled
   // enable/disable the register button based on the correctness
-  if(!isValidUsername(username)) {
+  if(!validate.isValidUsername(username)) {
     alert("Invalid username");
     return;
   }
-  if(!isValidEmail(email)) {
+  if(!validate.isValidEmail(email)) {
     alert("Invalid email");
     return;
   }
-  if(!isValidPassword(password)) {
+  if(!validate.isValidPassword(password)) {
     alert("Invalid password");
     return;
   }

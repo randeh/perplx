@@ -5,7 +5,7 @@
   var crypto = require("crypto");
   var db = require("./database");
   var clients = require("./clients");
-  var validate = require("./client/js/validate");
+  var validate = require("./client/scripts/validate");
   var bcrypt = require("bcrypt");
 
   var generateSession = function() {
@@ -17,30 +17,35 @@
       clients.messageClient(connection, "registerFailure", {});
       return;
     }
-    var account = {
-      username: data.username,
-      email: data.email,
-      password: bcrypt.hashSync(data.password, 10),
-      session: generateSession()
-    };
-    db.accounts.findOne({ username: account.username }, function(err, existingAccount) {
-      if(err) {
+    bcrypt.hash(data.password, 10, function(err, hash) {
+      if(err || !hash) {
         // TODO Something has gone wrong
-      } else if(existingAccount) {
-        clients.messageClient(connection, "registerFailure", {});
-        return;
       } else {
-        db.accounts.insert(account, function(err, inserted) {
-          if(err || !inserted) {
+        var account = {
+          username: data.username,
+          email: data.email,
+          password: hash,
+          session: generateSession()
+        };
+        db.accounts.findOne({ username: account.username }, function(err, existingAccount) {
+          if(err) {
             // TODO Something has gone wrong
+          } else if(existingAccount) {
+            clients.messageClient(connection, "registerFailure", {});
           } else {
-            connection.session = account.session;
-            clients.addClient(connection);
-            var data = {
-              username: account.username,
-              session: account.session
-            };
-            clients.messageClient(connection, "loginSuccess", data);
+            db.accounts.insert(account, function(err, inserted) {
+              if(err || !inserted) {
+                // TODO Something has gone wrong
+              } else {
+                connection.session = account.session;
+                clients.addClient(connection);
+                var data = {
+                  username: account.username,
+                  session: account.session
+                };
+                clients.messageClient(connection, "loginSuccess", data);
+              }
+            });
           }
         });
       }
@@ -54,28 +59,31 @@
       } else if(!account) {
         clients.messageClient(connection, "loginFailure", { message: "Invalid username." });
       } else {
-        if(bcrypt.compareSync(data.password, account.password)) {
-          if(account.hasOwnProperty("session")) {
-            clients.logoutSession(account.session);
-          }
-          var session = generateSession();
-          db.accounts.save({ _id: account._id }, { $set: { session: session } }, function(err, saved) {
-            if(err || !saved) {
-              // TODO Something has gone wrong
-            } else {
-              connection.session = session;
-              clients.addClient(connection);
-              var data = {
-                username: account.username,
-                session: session
-              };
-              clients.messageClient(connection, "loginSuccess", data);
+        bcrypt.compare(data.password, account.password, function(err, match) {
+          if(err) {
+            // TODO Something has gone wrong
+          } else if(match) {
+            if(account.hasOwnProperty("session")) {
+              clients.logoutSession(account.session);
             }
-          });
-        } else {
-          clients.messageClient(connection, "loginFailure", { message: "Invalid password." });
-        }
-        
+            var session = generateSession();
+            db.accounts.update({ _id: account._id }, { $set: { session: session } }, function(err, updated) {
+              if(err || !updated) {
+                // TODO Something has gone wrong
+              } else {
+                connection.session = session;
+                clients.addClient(connection);
+                var data = {
+                  username: account.username,
+                  session: session
+                };
+                clients.messageClient(connection, "loginSuccess", data);
+              }
+            });
+          } else {
+            clients.messageClient(connection, "loginFailure", { message: "Invalid password." });
+          }
+        });
       }
     });
   };

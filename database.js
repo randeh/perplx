@@ -2,7 +2,7 @@
 
 (function() {
 
-  var databaseUrl = "puzzle-game";
+  var databaseUrl = "perplx";
   var collections = ["accounts", "levels"];
 
   var db = require("mongojs").connect(databaseUrl, collections);

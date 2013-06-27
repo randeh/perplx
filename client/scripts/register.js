@@ -2,48 +2,52 @@
 
 // Add functionality to check name availability
 
+var openRegister;
+var closeRegister;
+
 $(document).ready(function(event) {
 
-/*
-  $("#register-username").blur(function(event) {
-    if(isValidUsername($("#register-username").val())) {
-      //
+  var validateFields = function() {
+    var $username = $("#register-username");
+    var usernameValid = validate.isValidUsername($username.val());
+    if(usernameValid) {
+      $username.removeClass("invalid");
+    } else {
+      $username.addClass("invalid");
     }
-  });
+    var $email = $("#register-email");
+    var emailValid = validate.isValidEmail($email.val());
+    if(emailValid) {
+      $email.removeClass("invalid");
+    } else {
+      $email.addClass("invalid");
+    }
+    var $password = $("#register-password");
+    var passwordValid = validate.isValidPassword($password.val());
+    if(passwordValid) {
+      $password.removeClass("invalid");
+    } else {
+      $password.addClass("invalid");
+    }
+    var $password2 = $("#register-password2");
+    var password2Valid = passwordValid && $password2.val() === $password.val();
+    if(password2Valid) {
+      $password2.removeClass("invalid");
+    } else {
+      $password2.addClass("invalid");
+    }
+    // Enable/disable the register button
+    if(usernameValid && emailValid && passwordValid && password2Valid) {
+      $("#register-button").removeAttr("disabled");
+    } else {
+      $("#register-button").addAttr("disabled", "disabled");
+    }
+  };
 
-  // make the fields belong to a class and do something like this:
-  colourFields = function() {
-    // blah
-  }
-  $(".register-fields").blur(colourFields).keyup(colourFields);
-*/
+  $(".register-fields").keyup(validateFields);
 
-/*
-  // TODO In the future, perform this validation as the form is filled
-  // enable/disable the register button based on the correctness
-  if(!validate.isValidUsername(username)) {
-    alert("Invalid username");
-    return;
-  }
-  if(!validate.isValidEmail(email)) {
-    alert("Invalid email");
-    return;
-  }
-  if(!validate.isValidPassword(password)) {
-    alert("Invalid password");
-    return;
-  }
-  if(password !== password2) {
-    alert("Passwords do not match");
-    return;
-  }
-*/
-
-  // onfocus colour box, display relevant tips
-  // onkeyup colour box
-  // onblur reset colour if empty, hide tips
-
-  // ^ also enable/disable register button as form is completed
+  // onfocus display relevant tips
+  // onblur hide tips
 
   $("#register-button").click(function(event) {
     var data = {
@@ -56,10 +60,20 @@ $(document).ready(function(event) {
     $("#loading-pane").show();
   });
 
-});
+  openRegister = function() {
+    $(".register-field").val("");
+    validateFields();
+    $("#register-pane").show();
+  };
 
-callbacks.registerFailure = function(data) {
-  // re-validate form
-  $("#register-pane").show();
-  alert(JSON.stringify(data)); // TEMP
-};
+  closeRegister = function() {
+    $("#register-pane").hide();
+  };
+
+  callbacks.registerFailure = function(data) {
+    validateFields();
+    $("#register-pane").show();
+    alert(JSON.stringify(data)); // TEMP
+  };
+
+});

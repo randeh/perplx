@@ -1,21 +1,35 @@
 "use strict";
 
-// TODO maybe have an init function for each pane
-// eg, initHome would clear #home-username and empty the list of levels etc.
+var openHome;
+var closeHome;
 
 $(document).ready(function(event) {
 
   $("#home-logout-button").click(function(event) {
     messageServer("logout", {});
-    $("#home-pane").hide();
+    closeHome();
     $("#loading-pane").show();
   });
+
+  $("#home-editor").click(function(event) {
+    closeHome();
+    openEditor();
+    event.preventDefault();
+  });
+
+  openHome = function() {
+    $("#home-username").text(sessionStorage.username);
+    $("#home-pane").show();
+  };
+
+  closeHome = function() {
+    $("#home-pane").hide();
+  };
 
 });
 
 callbacks.logoutSuccess = function() {
   delete localStorage.session;
-  $("#home-username").text("");
   $("#loading-pane").hide();
-  $("#login-pane").show();
+  openLogin();
 };

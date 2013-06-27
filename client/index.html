@@ -1,38 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Puzzle Game</title>
+    <title>Perplx</title>
     <meta charset="UTF-8" />
     <link rel="stylesheet" type="text/css" href="styles/main.css" />
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" ></script>
-    <script src="scripts/main.js"></script>
+<!--
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="scripts/socket.js"></script>
+    <script src="scripts/editor.js"></script>
     <script src="scripts/validate.js"></script>
     <script src="scripts/register.js"></script>
     <script src="scripts/login.js"></script>
     <script src="scripts/home.js"></script>
+-->
   </head>
   <body>
-    <div class="pane" id="loading-pane">
-      <img src="images/loading-spinner.gif" />
+    <div id="home-container">
+      <img class="home-pane" id="loading-spinner" src="images/loading-spinner.gif" />
+      <div class="home-pane" id="login-pane">
+        <div id="login-left">
+          <h1 id="login-title">Log in</h1>
+          <fieldset id="login-fields">
+            <label for="login-email" class="login-label">Email Address:</label><input type="text" class="field login-field" id="login-email" />
+            <label for="login-password" class="login-label">Password:</label><input type="password" class="field login-field" id="login-password" />
+          </fieldset>
+          <input type="button" value="Log in" id="login-button" />
+        </div>
+        <div id="login-right">
+          <p></emph>Perplx</emph> is an online platform where you can create and share puzzles with friends, which can then be completed either competitively or by working together.</p>
+          <p>Don't have an account? <a href="#" id="login-register">Sign up</a>.</p>
+        </div>
+      </div>
     </div>
-    <div class="pane" id="login-pane">
-      <h1>Log in</h1>
-      Username: <input type="text" class="field login-field" id="login-username" /><br />
-      Password: <input type="password" class="field login-field" id="login-password" /><br />
-      <input type="button" value="Log in" id="login-button" /><br /><br />
-      <a href="#" id="login-register">Register</a>
-    </div>
+<!--
     <div class="pane" id="register-pane">
       <h1>Register</h1>
-      Username: <input type="text" class="field register-field" id="register-username" /><br />
-      Email: <input type="text" class="field register-field" id="register-email" /><br />
-      Password: <input type="password" class="field register-field" id="register-password" /><br />
-      Re-enter Password: <input type="password" class="field register-field" id="register-password2" /><br />
-      <div id="register-tips">
-        <div class="register-tip" id="register-tip-username">Your username should be between 3 and 12 characters long, containing only letters and numbers. Usernames are case-sensitive.</div>
-        <div class="register-tip" id="register-tip-email">You must provide a valid email address for verification purposes.</div>
-        <div class="register-tip" id="register-tip-password"><!--write more stuff here-->You are advised to choose a strong password.</div>
-      </div>
+      <fieldset id="register-fields">
+        <label for="register-name">Display Name:</label>
+        <input type="text" class="field register-field" id="register-name" /><br />
+        <label for="register-email">Email:</label>
+        <input type="text" class="field register-field" id="register-email" /><br />
+        <label for="register-password">Password:</label>
+        <input type="password" class="field register-field" id="register-password" /><br />
+        <label for="register-password2">Re-enter Password:</label>
+        <input type="password" class="field register-field" id="register-password2" /><br />
+      </fieldset>
       <input type="button" value="Register" id="register-button" />
     </div>
     <div class="pane" id="home-pane">
@@ -45,9 +57,11 @@
     </div>
     <div class="pane" id="editor-pane">
       <h1>Editor</h1>
+      <canvas id="canvas" width="200" height="200"></canvas>
     </div>
     <div class="pane" id="play-pane">
       <h1>Play</h1>
     </div>
+-->
   </body>
 </html>

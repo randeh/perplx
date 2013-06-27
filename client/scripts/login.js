@@ -1,5 +1,8 @@
 "use strict";
 
+var openLogin;
+var closeLogin;
+
 $(document).ready(function(event) {
 
   $("#login-button").click(function(event) {
@@ -8,32 +11,36 @@ $(document).ready(function(event) {
       password: $("#login-password").val()
     };
     messageServer("login", data);
-    $("#login-pane").hide();
+    closeLogin();
     $("#loading-pane").show();
   });
 
   $("#login-register").click(function(event) {
-    $(".login-field").val("");
-    $("#login-pane").hide();
-    $("#register-pane").show();
+    closeLogin();
+    openRegister();
     event.preventDefault();
   });
+
+  openLogin = function() {
+    $("#login-pane").show();
+  };
+
+  closeLogin = function() {
+    $("#login-pane").hide();
+    $(".login-field").val("");
+  };
 
 });
 
 callbacks.loginSuccess = function(data) {
   $("#loading-pane").hide();
-  $(".field").val("");
-  // TODO: re-validate register form (i.e. clear error messages)
   localStorage.session = data.session;
-  $("#home-username").text(data.username);
-  $("#home-pane").show();
+  sessionStorage.username = data.username;
+  openHome();
 };
 
 callbacks.loginFailure = function(data) {
   $("#loading-pane").hide();
-  $("#login-password").val("");
-  $("#login-pane").show();
-  $("#login-password").focus();
-  alert(JSON.stringify(data));
+  openLogin();
+  alert(JSON.stringify(data)); // TEMP
 };

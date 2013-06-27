@@ -1,4 +1,5 @@
-A puzzle game.
+Perplx
+======
 
 To install the required dependencies and run the server, type:
 ```bash

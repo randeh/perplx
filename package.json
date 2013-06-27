@@ -4,7 +4,7 @@
   "author": "Ryan and Lewis Jackson",
   "repository": {
     "type": "git",
-    "url": "https://github.com/randeh/puzzle-game.git"
+    "url": "https://github.com/randeh/perplx.git"
   },
   "dependencies": {
     "websocket": "1.0.8",

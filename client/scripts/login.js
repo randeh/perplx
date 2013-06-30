@@ -1,46 +1,40 @@
 "use strict";
 
-var openLogin;
-var closeLogin;
-
 $(document).ready(function(event) {
 
   $("#login-button").click(function(event) {
     var data = {
-      username: $("#login-username").val(),
+      email: $("#login-email").val(),
       password: $("#login-password").val()
     };
     messageServer("login", data);
-    closeLogin();
-    $("#loading-pane").show();
+    $("#login-pane").hide();
+    $("#loading-spinner").show();
   });
 
   $("#login-register").click(function(event) {
-    closeLogin();
-    openRegister();
+    $("#login-pane").hide();
+    $(".login-field").val("");
+    $("#home-container").removeClass("login").addClass("register");
+    $("#register-pane").show();
     event.preventDefault();
   });
 
-  openLogin = function() {
-    $("#login-pane").show();
+  callbacks.loginSuccess = function(data) {
+    localStorage.session = data.session;
+    $(".login-field").val("");
+    $("#loading-spinner").hide();
+    $("#home-container").hide();
+    $("body").removeClass("prelogin");
+    $("#main-container").show();
+    $("#lobby-pane").show();
   };
 
-  closeLogin = function() {
-    $("#login-pane").hide();
-    $(".login-field").val("");
+  callbacks.loginFailure = function(data) {
+    $("#loading-spinner").hide();
+    $("#login-pane").show();
+    // TODO Display some kind of error message
+    alert(JSON.stringify(data)); // TEMP
   };
 
 });
-
-callbacks.loginSuccess = function(data) {
-  $("#loading-pane").hide();
-  localStorage.session = data.session;
-  sessionStorage.username = data.username;
-  openHome();
-};
-
-callbacks.loginFailure = function(data) {
-  $("#loading-pane").hide();
-  openLogin();
-  alert(JSON.stringify(data)); // TEMP
-};

@@ -2,7 +2,7 @@
 
 (function(exports) {
 
-  exports.isValidUsername = function(username) {
+  exports.isValidName = function(name) {
     return true;
   }
 
@@ -14,4 +14,4 @@
     return true;
   }
 
-}(typeof exports === undefined ? this.validate = {} : exports));
+}(typeof exports === "undefined" ? this.validate = {} : exports));

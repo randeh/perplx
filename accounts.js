@@ -13,7 +13,7 @@
   };
 
   module.exports.register = function(connection, data) {
-    if(!validate.isValidUsername(data.username) || !validate.isValidEmail(data.email) || !validate.isValidPassword(data.password)) {
+    if(!validate.isValidName(data.name) || !validate.isValidEmail(data.email) || !validate.isValidPassword(data.password)) {
       clients.messageClient(connection, "registerFailure", {});
       return;
     }
@@ -22,12 +22,12 @@
         // TODO Something has gone wrong
       } else {
         var account = {
-          username: data.username,
+          name: data.name,
           email: data.email,
           password: hash,
           session: generateSession()
         };
-        db.accounts.findOne({ username: account.username }, function(err, existingAccount) {
+        db.accounts.findOne({ $or: [ { name: account.name }, { email: account.email } ] }, function(err, existingAccount) {
           if(err) {
             // TODO Something has gone wrong
           } else if(existingAccount) {
@@ -40,7 +40,6 @@
                 connection.session = account.session;
                 clients.addClient(connection);
                 var data = {
-                  username: account.username,
                   session: account.session
                 };
                 clients.messageClient(connection, "loginSuccess", data);
@@ -53,11 +52,11 @@
   };
 
   module.exports.login = function(connection, data) {
-    db.accounts.findOne({ username: data.username }, function(err, account) {
+    db.accounts.findOne({ email: data.email }, function(err, account) {
       if(err) {
         // TODO Something has gone wrong
       } else if(!account) {
-        clients.messageClient(connection, "loginFailure", { message: "Invalid username." });
+        clients.messageClient(connection, "loginFailure", { message: "Invalid email address." });
       } else {
         bcrypt.compare(data.password, account.password, function(err, match) {
           if(err) {
@@ -74,7 +73,6 @@
                 connection.session = session;
                 clients.addClient(connection);
                 var data = {
-                  username: account.username,
                   session: session
                 };
                 clients.messageClient(connection, "loginSuccess", data);
@@ -98,7 +96,6 @@
         connection.session = account.session;
         clients.addClient(connection);
         var data = {
-          username: account.username,
           session: account.session
         };
         clients.messageClient(connection, "loginSuccess", data);

@@ -40,18 +40,17 @@ wsServer.on("request", function(request) {
     var action = messageContent.action;
     var data = messageContent.data;
     if(messageContent.hasOwnProperty("session")) {
-      var session = messageContent.session;
-      if(session !== connection.session) {
-        // Session is wrong for this connection
-        clients.messageClient(connection, "sessionInvalid", {});
-      }
-      switch(action) {
-        case "logout":
-          accounts.logout(connection, data);
-          break;
-        default:
-          // Unexpected action
-          break;
+      if(messageContent.session === connection.session) {
+        switch(action) {
+          case "logout":
+            accounts.logout(connection, data);
+            break;
+          default:
+            // Unexpected action
+            break;
+        }
+      } else {
+        connection.close();
       }
     } else {
       switch(action) {
@@ -72,7 +71,7 @@ wsServer.on("request", function(request) {
   });
 
   connection.on("close", function(reasonCode, description) {
-    if(connection.session !== undefined) {
+    if(typeof connection.session !== "undefined") {
       clients.removeClient(connection);
     }
     console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");

@@ -21,7 +21,7 @@
     for(var i=0; i<clients.length; i++) {
       if(clients[i].session === session) {
         delete clients[i].session;
-        module.exports.messageClient(clients[i], "sessionInvalid", {});
+        module.exports.messageClient(clients[i], "logoutSuccess", {});
         break;
       }
     }

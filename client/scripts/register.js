@@ -1,19 +1,71 @@
 "use strict";
 
-// Add functionality to check name availability
-
-var openRegister;
-var closeRegister;
+// TODO Add functionality to check name availability
 
 $(document).ready(function(event) {
 
+  $("#register-button").click(function(event) {
+    var data = {
+      name: $("#register-name").val(),
+      email: $("#register-email").val(),
+      password: $("#register-password").val()
+    };
+    messageServer("register", data);
+    $("#register-pane").hide();
+    $("#loading-spinner").show();
+  });
+
+  $("#register-login").click(function(event) {
+    $("#register-pane").hide();
+    $(".register-field").val("");
+    validate();
+    $("#home-container").removeClass("register").addClass("login");
+    $("#login-pane").show();
+    event.preventDefault();
+  });
+
+  callbacks.nameAvailable = function(data) {
+    //check data.name matches current field content, then update message
+  };
+
+  callbacks.nameUnavailable = function(data) {
+    //check data.name matches current field content, then update message
+  };
+
+  callbacks.registerSuccess = function(data) {
+    localStorage.session = data.session;
+    $(".register-field").val("");
+    validate();
+    $("#loading-spinner").hide();
+    $("#home-container").hide();
+    $("body").removeClass("prelogin");
+    $("#main-container").show();
+    $("#lobby-pane").show();
+    // TODO Maybe go to a tutorial
+  };
+
+  callbacks.registerFailure = function(data) {
+    $("#loading-spinner").hide();
+    validate();
+    $("#register-pane").show();
+    // TODO Display error if registration failed for some reason beyond user control
+    alert(JSON.stringify(data)); // TEMP
+  };
+
+  var validate = function() {
+    //
+  };
+
+});
+
+/*
   var validateFields = function() {
-    var $username = $("#register-username");
-    var usernameValid = validate.isValidUsername($username.val());
-    if(usernameValid) {
-      $username.removeClass("invalid");
+    var $name = $("#register-name");
+    var nameValid = validate.isValidName($name.val());
+    if(nameValid) {
+      $name.removeClass("invalid");
     } else {
-      $username.addClass("invalid");
+      $name.addClass("invalid");
     }
     var $email = $("#register-email");
     var emailValid = validate.isValidEmail($email.val());
@@ -37,43 +89,12 @@ $(document).ready(function(event) {
       $password2.addClass("invalid");
     }
     // Enable/disable the register button
-    if(usernameValid && emailValid && passwordValid && password2Valid) {
+    if(nameValid && emailValid && passwordValid && password2Valid) {
       $("#register-button").removeAttr("disabled");
     } else {
       $("#register-button").addAttr("disabled", "disabled");
     }
   };
 
-  $(".register-fields").keyup(validateFields);
-
-  // onfocus display relevant tips
-  // onblur hide tips
-
-  $("#register-button").click(function(event) {
-    var data = {
-      username: $("#register-username").val(),
-      email: $("#register-email").val(),
-      password: $("#register-password").val()
-    };
-    messageServer("register", data);
-    $("#register-pane").hide();
-    $("#loading-pane").show();
-  });
-
-  openRegister = function() {
-    $(".register-field").val("");
-    validateFields();
-    $("#register-pane").show();
-  };
-
-  closeRegister = function() {
-    $("#register-pane").hide();
-  };
-
-  callbacks.registerFailure = function(data) {
-    validateFields();
-    $("#register-pane").show();
-    alert(JSON.stringify(data)); // TEMP
-  };
-
-});
+  $(".register-field").keyup(validateFields);
+*/

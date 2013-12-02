@@ -10,12 +10,11 @@ $(document).ready(function(event) {
   socket.addEventListener("open", function(event) {
     if(typeof localStorage.session === "undefined") {
       $("body").addClass("prelogin");
-      $("#home-container").addClass("login");
-      $("#home-container").show();
+      $("#home-container").addClass("login").show();
       $("#login-pane").show();
     } else {
       var data = {
-        session: localStorage.session
+        "session": localStorage.session
       };
       delete localStorage.session;
       messageServer("checkSession", data);
@@ -24,7 +23,7 @@ $(document).ready(function(event) {
 
   socket.addEventListener("message", function(event) {
     var response = JSON.parse(event.data);
-    callbacks[response.action](response.data);
+    callbacks[response["action"]](response["data"]);
   });
 
   socket.addEventListener("error", function(event) {
@@ -37,25 +36,24 @@ $(document).ready(function(event) {
 
   messageServer = function(action, data) {
     var message = {
-      action: action,
-      data: data
+      "action": action,
+      "data": data
     };
     if(typeof localStorage.session !== "undefined") {
-      message.session = localStorage.session;
+      message["session"] = localStorage.session;
     }
     socket.send(JSON.stringify(message));
   };
 
   callbacks.sessionInvalid = function(data) {
     delete localStorage.session;
-      $("body").addClass("prelogin");
-      $("#home-container").addClass("login");
-      $("#home-container").show();
-      $("#login-pane").show();
+    $("body").addClass("prelogin");
+    $("#home-container").addClass("login").show();
+    $("#login-pane").show();
   }
 
   callbacks.displayError = function(data) {
-    alert(data.message);
+    alert(data["message"]);
   };
 
 });

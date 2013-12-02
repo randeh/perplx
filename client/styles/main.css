@@ -1,5 +1,5 @@
 body {
-  margin: 20px;
+  margin: 0px;
   padding: 0px;
   font-family: verdana;
   font-size: 13px;
@@ -96,4 +96,9 @@ body.prelogin {
 
 #main-container, .main-pane {
   display: none;
+}
+
+/* editor */
+ol.tree {
+  list-style-type: none;
 }

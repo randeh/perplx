@@ -1,11 +1,13 @@
 "use strict";
 
+// TODO disable login button until fields validate?
+
 $(document).ready(function(event) {
 
   $("#login-button").click(function(event) {
     var data = {
-      email: $("#login-email").val(),
-      password: $("#login-password").val()
+      "email": $("#login-email").val(),
+      "password": $("#login-password").val()
     };
     messageServer("login", data);
     $("#login-pane").hide();
@@ -21,7 +23,7 @@ $(document).ready(function(event) {
   });
 
   callbacks.loginSuccess = function(data) {
-    localStorage.session = data.session;
+    localStorage.session = data["session"];
     $(".login-field").val("");
     $("#loading-spinner").hide();
     $("#home-container").hide();

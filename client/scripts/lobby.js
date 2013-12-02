@@ -10,4 +10,10 @@ $(document).ready(function(event) {
     delete localStorage.session;
   };
 
+  $("#lobby-editor").click(function(event) {
+    $("#lobby-pane").hide();
+    $("#editor-pane").show();
+    event.preventDefault();
+  });
+
 });

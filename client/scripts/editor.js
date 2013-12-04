@@ -2,13 +2,50 @@
 
 $(document).ready(function(event) {
 
+  // Fields: [name (no formula allowed) : String, width : Number, height : Number, color : Color, x : Number, y : Number]
+  // use this["name"] instead of this.name to bypass minification
+
+  // Next Task?
+  // expand/collapse groups
+  // hide checkboxes and only allow selection of one object at a time
+  // populate inspector pane with fields when an object is selected
+  // choose what type of object you want to create
+  // add new objects to the selected group rather than always top-level
+
+/*
+<li>
+<img src="images/minus.png">
+<span>myGroup : Group</span>
+<ol>
+...
+</ol>
+</li>
+*/
+
   var Object = function(name) {
     if(arguments.length == 0) {
       return;
     }
     this.id = nextAvailableId++;
-    this.name = name;
+    this.name = { "value": name, "method": "setName" };
+    this.children = [];
+    var 
+    var checkbox = $(document.createElement("input")).prop("type", "checkbox").prop("id", "tree-item-" + this.id);
+    this.label = $(document.createElement("label")).prop("for", checkbox.attr("id")).text(this.name.value + " : " + this.type);
+    this.listItem = $(document.createElement("li")).append(this.label).append(checkbox);
+    if(this.type == "Scene" || this.type == "Group") {
+      this.childrenList = $(document.createElement("ol")).addClass("tree");
+      this.listItem.append(this.childrenList);
+    }
   };
+  Object.prototype.setName = function(name) {
+    this.name.value = name;
+    this.label.text(name + " : " + this.type);
+  }
+  Object.prototype.addChild = function(child) {
+    this.children.push(child);
+    this.childrenList.append(child.listItem);
+  }
 
   var Scene = function(name, width, height, color) {
     Object.apply(this, [name]);
@@ -24,59 +61,62 @@ $(document).ready(function(event) {
     });
     this.canvas.prop({ "width": width, "height": height });
     this.context = this.canvas[0].getContext("2d");
-    this.width = width;
-    this.height = height;
-    this.color = color;
-    this.children = [];
+    this.width = { "value": width, "method": "setWidth" };
+    this.height = { "value": height, "method": "setHeight" };
+    this.color = { "value": color, "method": "setColor" };
   };
   Scene.prototype = new Object();
   Scene.prototype.constructor = Scene;
   Scene.prototype.type = "Scene";
   Scene.prototype.setWidth = function(width) {
-    this.width = width;
+    this.width.value = width;
     this.canvas.prop({ "width": width });
     this.canvas.css({ "margin-left": -width / 2 });
   }
   Scene.prototype.setHeight = function(height) {
-    this.height = height;
+    this.height.value = height;
     this.canvas.prop({ "height": height });
     this.canvas.css({ "margin-top": -height / 2 });
   }
   Scene.prototype.setColor = function(color) {
-    this.color = color;
+    this.color.value = color;
     this.canvas.css({ "background-color": color });
   }
-  Scene.prototype.getContext = function() {
-    return this.context;
-  }
-/*
+
   var Group = function(name) {
     Object.apply(this, [name]);
-    this.children = [];
   };
   Group.prototype = new Object();
   Group.prototype.constructor = Group;
   Group.prototype.type = "Group";
-*/
+
   var Rect = function(name, color, x, y, width, height) {
     Object.apply(this, [name]);
-    this.color = color;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+    this.color = { "value": color };
+    this.x = { "value": x };
+    this.y = { "value": y };
+    this.width = { "value": width };
+    this.height = { "value": height };
   };
   Rect.prototype = new Object();
   Rect.prototype.constructor = Rect;
   Rect.prototype.type = "Rect";
   Rect.prototype.draw = function(context) {
-    context.fillStyle = this.color;
-    context.fillRect(this.x, this.y, this.width, this.height);
+    context.fillStyle = this.color.value;
+    context.fillRect(this.x.value, this.y.value, this.width.value, this.height.value);
   }
 
   var nextAvailableId = 0;
   var scene = new Scene("myGame", 700, 500, "#eeeeee");
-  var context = scene.getContext();
+  $("#editor-tree-list").append(scene.listItem);
+  var context = scene.context;
+
+  var draw = function() {
+    context.clearRect(0, 0, scene.width.value, scene.height.value);
+    for(var i = 0; i < scene.children.length; i++) {
+      scene.children[i].draw(context);
+    }
+  };
 
   function getRandomColor() {
     var letters = "0123456789abcdef".split("");
@@ -87,27 +127,11 @@ $(document).ready(function(event) {
     return color;
   }
 
-  $(scene).on("add", function(event, item) {
-    // <li><input type="checkbox" id="tree-item-ID" /><label for="tree-item-ID">NAME</label></li>
-    // give these a class for styling purposes?
-    var checkbox = $(document.createElement("input")).prop("type", "checkbox").prop("id", "tree-item-" + item.id);
-    var label = $(document.createElement("label")).prop("for", checkbox.attr("id")).text(item.name + " : " + item.type);
-    var listItem = $(document.createElement("li")).append(checkbox).append(label);
-    $("#editor-tree-list").append(listItem);
-  });
-
-  var draw = function() {
-    context.clearRect(0, 0, scene.width, scene.height);
-    for(var i = 0; i < scene.children.length; i++) {
-      scene.children[i].draw(context);
-    }
-  };
-
   $("#editor-new-button").click(function(event) {
     var size = 100;
-    var shape = new Rect("rect" + nextAvailableId, getRandomColor(), Math.random() * (scene.width - size), Math.random() * (scene.height - size), size, size);
-    scene.children.push(shape);
-    $(scene).trigger("add", shape);
+    var color = getRandomColor();
+    var shape = new Rect("rect " + color, color, Math.random() * (scene.width.value - size), Math.random() * (scene.height.value - size), size, size);
+    scene.addChild(shape);
     draw();
   });
 

@@ -5,7 +5,7 @@
   var crypto = require("crypto");
   var db = require("./database");
   var clients = require("./clients");
-  var validate = require("./client/scripts/validate");
+  var validate = require("./../client/scripts/validate");
   var bcrypt = require("bcrypt");
 
   var generateSession = function() {

@@ -83,7 +83,7 @@ body.prelogin {
   margin-right: 0px;
 }
 .home-field.invalid {
-  background-color: #FF9999;
+  background-color: #ff9999;
 }
 .home-button {
   margin-top: 20px;
@@ -101,4 +101,11 @@ body.prelogin {
 /* editor */
 ol.tree {
   list-style-type: none;
+  margin-left: 10px;
+}
+ol.tree input[type="checkbox"] {
+  display: none;
+}
+input[type="checkbox"]:checked + ol {
+  display: none;
 }

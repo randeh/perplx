@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="styles/reset.css">
     <link rel="stylesheet" type="text/css" href="styles/main.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="scripts/main.js"></script>
     <script src="scripts/socket.js"></script>
     <script src="scripts/validate.js"></script>
     <script src="scripts/register.js"></script>
@@ -23,10 +24,10 @@
             <label class="home-label" for="login-email">Email Address:</label><input type="text" class="home-field login-field" id="login-email">
             <label class="home-label" for="login-password">Password:</label><input type="password" class="home-field login-field" id="login-password">
           </fieldset>
-          <input type="button" value="Log in" class="home-button" id="login-button">
+          <input type="button" value="Log in" class="home-button" id="login-button" disabled>
         </div>
         <div class="home-right">
-          <p></emph>Perplx</emph> is an online platform where you can create and share puzzles with friends, which can then be completed either competitively or by working together.</p>
+          <p><emph>Perplx</emph> is an online platform where you can create and share puzzles with friends, which can then be completed either competitively or by working together.</p>
           <p>Don't have an account? <a href="#" id="login-register">Sign up</a>.</p>
         </div>
       </div>
@@ -39,7 +40,7 @@
             <label class="home-label" for="register-password">Password:</label><input type="password" class="home-field register-field" id="register-password">
             <label class="home-label" for="register-password2">Re-enter Password:</label><input type="password" class="home-field register-field" id="register-password2">
           </fieldset>
-          <input type="button" value="Sign up" class="home-button" id="register-button">
+          <input type="button" value="Sign up" class="home-button" id="register-button" disabled>
         </div>
         <div class="home-right">
           <p>Already have an account? <a href="#" id="register-login">Log in</a>.</p>
@@ -54,19 +55,17 @@
         <a href="#" id="lobby-editor">Editor</a>
       </div>
       <div class="main-pane" id="editor-pane">
-        <div id="editor-canvas-holder" style="position: absolute; top: 0px; left: 0px; right: 300px; height: 100%; overflow: auto;">
-          <canvas id="editor-canvas" width="700px" height="500px" style="position: absolute; top: 50%; left: 50%; margin-top: -250px; margin-left: -350px;"></canvas>
-        </div>
-        <div id="editor-sidebar" style="position: absolute; top: 0px; right: 0px; width: 300px; height: 100%;">
-          <div id="editor-tree" style="height: calc(50% - 46px); overflow: auto;">
+        <div id="editor-canvas-holder"></div>
+        <div id="editor-sidebar">
+          <div id="editor-tree">
             <ol class="tree" id="editor-tree-list"></ol>
           </div>
-          <div id="editor-buttons" style="height: 26px">
+          <div id="editor-buttons">
             <input type="button" value="New" id="editor-new-button">
             <input type="button" value="Delete" id="editor-delete-button">
           </div>
-          <div id="editor-properties" style="height: calc(50% - 46px); overflow: auto;"></div>
-          <div id="editor-controls" style="height: 26px;">
+          <div id="editor-properties"></div>
+          <div id="editor-controls">
             <input type="button" value="Save" id="editor-new-button">
             <input type="button" value="Test" id="editor-delete-button">
             <input type="button" value="Publish" id="editor-delete-button">

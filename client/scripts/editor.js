@@ -1,5 +1,7 @@
 "use strict";
 
+var openEditor;
+
 $(document).ready(function(event) {
 
   var fields = [
@@ -12,14 +14,43 @@ $(document).ready(function(event) {
     { name: "y",               display: "Y Position",       htmlType: "number", type: "integer" }
   ];
 
+  var nextAvailableId;
+  var scene;
+  var selected;
+
+  openEditor = function() {
+    if(closeCurrentWindow !== null) {
+      closeCurrentWindow();
+    }
+    $("#main-container").show();
+    $("#editor-pane").show();
+    nextAvailableId = 0;
+    scene = new Scene("myGame", 700, 500, "#eeeeee");
+    selected = null;
+    closeCurrentWindow = closeEditor;
+  };
+
+  var closeEditor = function() {
+    $("#main-container").hide();
+    $("#editor-pane").hide();
+    $("#editor-canvas-holder").empty();
+    $("#editor-tree-list").empty();
+    $("#editor-properties").empty();
+    nextAvailableId = 0;
+    scene = null;
+    selected = null;
+    closeCurrentWindow = null;
+  };
+
   // Next Task?
   // allow formulae as input (except for names)
   // save button
 
   // Overall tasks
-  // remove inline css
+  // write validation functions
   // tighten up login/register validation & error messages
   // change css slightly so it looks like the same with/without reset.css
+  // check tab indexes for forms
 
   // use this["name"] instead of this.name so nothing breaks if the code is ever minified
 
@@ -80,7 +111,7 @@ $(document).ready(function(event) {
         var id = field.name + this.id;
         var label = $(document.createElement("label")).prop("for", id).text(field.display + ":");
         var input = $(document.createElement("input")).prop({ "id": id, "type": field.htmlType, "value": this[field.name].value });
-        input.change({ field: field, input: input }, function(event) {
+        input.on("input", { field: field, input: input }, function(event) {
           var field = event.data.field;
           var input = event.data.input;
           if(obj[field.name].method !== undefined) {
@@ -114,6 +145,7 @@ $(document).ready(function(event) {
 
   var Scene = function(name, width, height, backgroundColor) {
     Object.apply(this, [name]);
+    $("#editor-tree-list").append(this.listItem);
     this.canvas = $(document.createElement("canvas")).attr("id", "editor-canvas");
     $("#editor-canvas-holder").append(this.canvas);
     this.canvas.css({
@@ -185,11 +217,6 @@ $(document).ready(function(event) {
     context.fillRect(this.x.value, this.y.value, this.width.value, this.height.value);
   };
 
-  var nextAvailableId = 0;
-  var scene = new Scene("myGame", 700, 500, "#eeeeee");
-  $("#editor-tree-list").append(scene.listItem);
-  var selected = null;
-
   var getRandomColor = function() {
     var letters = "0123456789abcdef".split("");
     var color = "#";
@@ -200,8 +227,8 @@ $(document).ready(function(event) {
   };
 
   $("#editor-new-button").click(function(event) {
-    var type = prompt("What type of object?", "Rect");
-    var name = prompt("Object name", "");
+    var type = prompt("Type", "Rect");
+    var name = prompt("Name", "");
     var object;
     if(type == "Rect") {
       var size = 100;

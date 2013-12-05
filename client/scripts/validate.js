@@ -3,11 +3,11 @@
 (function(exports) {
 
   exports.isValidName = function(name) {
-    return true;
+    return name.length >= 3 && name.length <= 12;
   }
 
   exports.isValidPassword = function(password) {
-    return true;
+    return password.length >= 6 && password.length <= 10;
   }
 
   exports.isValidEmail = function(email) {

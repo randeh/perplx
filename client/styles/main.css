@@ -1,3 +1,4 @@
+/* General */
 body {
   margin: 0px;
   padding: 0px;
@@ -21,6 +22,7 @@ h2 {
   line-height: 25px;
 }
 
+/* Home */
 body.prelogin {
   background-image: url('../images/home-background.jpg');
 }
@@ -94,12 +96,33 @@ body.prelogin {
   display: none;
 }
 
+/* Main */
 #main-container, .main-pane {
   display: none;
 }
 
-/* editor */
-#editor-tree {
+/* Editor */
+#editor-canvas-holder {
+   position: absolute;
+   top: 0px;
+   left: 0px;
+   right: 300px;
+   height: 100%;
+   overflow: auto;
+}
+#editor-sidebar {
+   position: absolute;
+   top: 0px;
+   right: 0px;
+   width: 300px;
+   height: 100%;
+}
+#editor-buttons, #editor-controls {
+  height: 26px;
+}
+#editor-tree, #editor-properties {
+  height: calc(50% - 46px);
+  overflow: auto;
   padding: 10px;
 }
 ol.tree {
@@ -115,7 +138,4 @@ ol.tree img {
 }
 ol.tree span.selected {
   background-color: #cccccc;
-}
-#editor-properties {
-  padding: 10px;
 }

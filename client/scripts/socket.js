@@ -9,9 +9,7 @@ $(document).ready(function(event) {
 
   socket.addEventListener("open", function(event) {
     if(typeof localStorage.session === "undefined") {
-      $("body").addClass("prelogin");
-      $("#home-container").addClass("login").show();
-      $("#login-pane").show();
+      openLogin();
     } else {
       var data = {
         "session": localStorage.session
@@ -47,13 +45,11 @@ $(document).ready(function(event) {
 
   callbacks.sessionInvalid = function(data) {
     delete localStorage.session;
-    $("body").addClass("prelogin");
-    $("#home-container").addClass("login").show();
-    $("#login-pane").show();
+    openLogin();
   }
 
   callbacks.displayError = function(data) {
-    alert(data["message"]);
+    throw(data["message"]);
   };
 
 });

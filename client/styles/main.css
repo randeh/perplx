@@ -108,6 +108,10 @@ ol.tree {
 }
 ol.tree span {
   margin-left: 5px;
+  cursor: pointer;
+}
+ol.tree img {
+  cursor: pointer;
 }
 ol.tree span.selected {
   background-color: #cccccc;

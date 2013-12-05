@@ -13,9 +13,14 @@ $(document).ready(function(event) {
   ];
 
   // Next Task?
-  // allow formulae as input (except for names & maybe colors)
+  // allow formulae as input (except for names)
+  // save button
 
-  // anywhere .css() is used, could it be improved with static css and adding/removing classes?
+  // Overall tasks
+  // remove inline css
+  // tighten up login/register validation & error messages
+  // change css slightly so it looks like the same with/without reset.css
+
   // use this["name"] instead of this.name so nothing breaks if the code is ever minified
 
   var Object = function(name) {
@@ -24,13 +29,13 @@ $(document).ready(function(event) {
     }
     this.id = nextAvailableId++;
     this.name = { "value": name, "method": "setName" };
-    this.label = $(document.createElement("span")).text(this.name.value + " : " + this.type).css("cursor", "pointer");
+    this.label = $(document.createElement("span")).text(this.name.value + " : " + this.type);
     var obj = this;
     this.label.click(function(event) { obj.select() });
     this.listItem = $(document.createElement("li")).append(this.label);
     if(this.isContainer) {
       this.children = [];
-      this.button = $(document.createElement("img")).prop("src", "images/plus.png").css("cursor", "pointer");
+      this.button = $(document.createElement("img")).prop("src", "images/plus.png");
       this.childrenList = $(document.createElement("ol")).addClass("tree").hide();
       this.button.click(function(event) { obj.expand() });
       this.listItem.prepend(this.button).append(this.childrenList);
@@ -74,30 +79,24 @@ $(document).ready(function(event) {
       if(this[field.name] !== undefined) {
         var id = field.name + this.id;
         var label = $(document.createElement("label")).prop("for", id).text(field.display + ":");
-        var container = $(document.createElement("div")).append(label);
-        var input;
-        switch(field.type) {
-          default:
-            input = $(document.createElement("input")).prop({ "id": id, "type": field.htmlType, "value": this[field.name].value });
-            input.change({ field: field, input: input }, function(event) {
-              var field = event.data.field;
-              var input = event.data.input;
-              if(obj[field.name].method !== undefined) {
-                obj[obj[field.name].method](input.val());
-              } else {
-                obj[field.name].value = input.val();
-              }
-              if(obj.isDrawable && field.name != "name") {
-                draw();
-              }
-            });
-            container.append(input);
-            break;
-        }
+        var input = $(document.createElement("input")).prop({ "id": id, "type": field.htmlType, "value": this[field.name].value });
+        input.change({ field: field, input: input }, function(event) {
+          var field = event.data.field;
+          var input = event.data.input;
+          if(obj[field.name].method !== undefined) {
+            obj[obj[field.name].method](input.val());
+          } else {
+            obj[field.name].value = input.val();
+          }
+          if(obj.isDrawable && field.name != "name") {
+            scene.draw();
+          }
+        });
+        var container = $(document.createElement("div")).append(label).append(input);
         $("#editor-properties").append(container);
       }
     }
-  }
+  };
   Object.prototype.expand = function() {
     this.childrenList.show();
     this.button.prop("src", "images/minus.png");
@@ -135,6 +134,12 @@ $(document).ready(function(event) {
   Scene.prototype.constructor = Scene;
   Scene.prototype.type = "Scene";
   Scene.prototype.isContainer = true;
+  Scene.prototype.draw = function() {
+    this.context.clearRect(0, 0, this.width.value, this.height.value);
+    for(var i = 0; i < this.children.length; i++) {
+      this.children[i].draw(this.context);
+    }
+  };
   Scene.prototype.setWidth = function(width) {
     this.width.value = width;
     this.canvas.prop({ "width": width });
@@ -157,6 +162,11 @@ $(document).ready(function(event) {
   Group.prototype.constructor = Group;
   Group.prototype.type = "Group";
   Group.prototype.isContainer = true;
+  Group.prototype.draw = function(context) {
+    for(var i = 0; i < this.children.length; i++) {
+      this.children[i].draw(context);
+    }
+  };
 
   var Rect = function(name, backgroundColor, x, y, width, height) {
     Object.apply(this, [name]);
@@ -179,16 +189,6 @@ $(document).ready(function(event) {
   var scene = new Scene("myGame", 700, 500, "#eeeeee");
   $("#editor-tree-list").append(scene.listItem);
   var selected = null;
-
-  var draw = function() {
-    scene.context.clearRect(0, 0, scene.width.value, scene.height.value);
-    for(var i = 0; i < scene.children.length; i++) {
-      var object = scene.children[i];
-      if(object.isDrawable) {
-        object.draw(scene.context);
-      }
-    }
-  };
 
   var getRandomColor = function() {
     var letters = "0123456789abcdef".split("");
@@ -223,7 +223,20 @@ $(document).ready(function(event) {
       parent = selected.parent;
     }
     parent.addChild(object);
-    draw();
+    scene.draw();
   });
+
+  // If a group is deleted, there will be circular references between .children and .parent possibly preventing garbage collection
+  $("#editor-delete-button").click(function(event) {
+    if(selected !== "undefined" && selected.type != "Scene") {
+      var object = selected;
+      object.deselect();
+      object.parent.children = jQuery.grep(object.parent.children, function(arrayItem) {
+        return arrayItem != object;
+      });
+      object.listItem.empty().remove();
+      scene.draw();
+    }
+  })
 
 });

@@ -99,13 +99,19 @@ body.prelogin {
 }
 
 /* editor */
+#editor-tree {
+  padding: 10px;
+}
 ol.tree {
   list-style-type: none;
   margin-left: 10px;
 }
-ol.tree input[type="checkbox"] {
-  display: none;
+ol.tree span {
+  margin-left: 5px;
 }
-input[type="checkbox"]:checked + ol {
-  display: none;
+ol.tree span.selected {
+  background-color: #cccccc;
+}
+#editor-properties {
+  padding: 10px;
 }

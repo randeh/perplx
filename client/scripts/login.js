@@ -62,9 +62,9 @@ $(document).ready(function(event) {
   };
 
   var validateFields = function() {
-    var email = validate.isValidEmail($("#login-email").val());
-    var password = validate.isValidPassword($("#login-password").val());
-    if(email && password) {
+    var emailValid = validate.isValidEmail($("#login-email").val());
+    var passwordValid = validate.isValidPassword($("#login-password").val());
+    if(emailValid && passwordValid) {
       $("#login-button").removeAttr("disabled");
       return true;
     } else {

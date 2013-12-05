@@ -1,5 +1,16 @@
 "use strict";
 
+// Tasks
+// allow formulae as input (except for names)
+// gui which asks for name & type when creating an object
+// save button
+// dynamic fields
+// name availability
+// login/register error messages (server-side errors e.g. email already in use)
+// change css slightly so it looks like the same with/without reset.css
+
+// use this["name"] instead of this.name so nothing breaks if the code is ever minified
+
 var openEditor;
 
 $(document).ready(function(event) {
@@ -42,18 +53,6 @@ $(document).ready(function(event) {
     closeCurrentWindow = null;
   };
 
-  // Next Task?
-  // allow formulae as input (except for names)
-  // save button
-
-  // Overall tasks
-  // write validation functions
-  // tighten up login/register validation & error messages
-  // change css slightly so it looks like the same with/without reset.css
-  // check tab indexes for forms
-
-  // use this["name"] instead of this.name so nothing breaks if the code is ever minified
-
   var Object = function(name) {
     if(arguments.length == 0) {
       return;
@@ -73,7 +72,6 @@ $(document).ready(function(event) {
     }
   };
   Object.prototype.isContainer = false;
-  Object.prototype.isDrawable = false;
   Object.prototype.setName = function(name) {
     this.name.value = name;
     this.label.text(this.name.value + " : " + this.type);
@@ -119,7 +117,7 @@ $(document).ready(function(event) {
           } else {
             obj[field.name].value = input.val();
           }
-          if(obj.isDrawable && field.name != "name") {
+          if(field.name != "name") {
             scene.draw();
           }
         });
@@ -211,7 +209,6 @@ $(document).ready(function(event) {
   Rect.prototype = new Object();
   Rect.prototype.constructor = Rect;
   Rect.prototype.type = "Rect";
-  Rect.prototype.isDrawable = true;
   Rect.prototype.draw = function(context) {
     context.fillStyle = this.backgroundColor.value;
     context.fillRect(this.x.value, this.y.value, this.width.value, this.height.value);

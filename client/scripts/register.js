@@ -19,9 +19,9 @@ $(document).ready(function(event) {
     $("body").removeClass("prelogin");
     $("#home-container").removeClass("register").hide();
     $("#register-pane").hide();
-    $(".register-field").val("");
+    $(".register-field").val("").removeClass("invalid");
     $("#register-button").attr("disabled", "disabled");
-    // TODO Clear error messages
+    $(".register-tip").hide();
     closeCurrentWindow = null;
   };
 
@@ -71,13 +71,35 @@ $(document).ready(function(event) {
     alert(JSON.stringify(data)); // TEMP
   };
 
+  $("#register-name").focus(function(event) {
+    $("#register-tip-name").show();
+  });
+  $("#register-name").blur(function(event) {
+    $("#register-tip-name").hide();
+  });
+
+  $("#register-password").focus(function(event) {
+    $("#register-tip-password").show();
+  });
+  $("#register-password").blur(function(event) {
+    $("#register-tip-password").hide();
+  });
+
   var validateFields = function() {
-    // TODO Tell the user what's wrong?
-    var name = validate.isValidName($("#register-name").val());
-    var email = validate.isValidEmail($("#register-email").val());
-    var password = validate.isValidPassword($("#register-password").val());
-    var password2 = password && $("#register-password").val() == $("#register-password2").val();
-    if(name && email && password && password2) {
+    var fields = [$("#register-name"), $("#register-email"), $("#register-password"), $("#register-password2")];
+    var valid = new Array();
+    valid[0] = validate.isValidName(fields[0].val());
+    valid[1] = validate.isValidEmail(fields[1].val());
+    valid[2] = validate.isValidPassword(fields[2].val());
+    valid[3] = valid[2] && fields[3].val() == fields[2].val();
+    for(var i = 0; i < fields.length; i++) {
+      if(!valid[i] && fields[i].val() != "") {
+        fields[i].addClass("invalid");
+      } else {
+        fields[i].removeClass("invalid");
+      }
+    }
+    if(valid[0] && valid[1] && valid[2] && valid[3]) {
       $("#register-button").removeAttr("disabled");
       return true;
     } else {

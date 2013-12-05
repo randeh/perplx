@@ -95,6 +95,9 @@ body.prelogin {
 #home-container, .home-pane, #loading-spinner {
   display: none;
 }
+.register-tip {
+  display: none;
+}
 
 /* Main */
 #main-container, .main-pane {

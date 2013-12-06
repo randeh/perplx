@@ -16,10 +16,15 @@ a:hover {
 h1 {
   font-size: 18px;
   line-height: 28px;
+  font-weight: bold;
+  margin: 12px 0;
 }
 h2 {
   font-size: 15px;
   line-height: 25px;
+}
+p {
+  margin: 13px 0;
 }
 
 /* Home */
@@ -84,7 +89,7 @@ body.prelogin {
   margin-left: 0px;
   margin-right: 0px;
 }
-.home-field.invalid {
+.home-field.invalid, .home-field.unavailable {
   background-color: #ff9999;
 }
 .home-button {
@@ -92,11 +97,18 @@ body.prelogin {
   margin-right: 36px;
   float: right;
 }
-#home-container, .home-pane, #loading-spinner {
+#home-container, .home-pane, #loading-spinner, .register-tip {
   display: none;
 }
-.register-tip {
-  display: none;
+#login-error, #register-error {
+  display: inline-block;
+  margin: 20px 0 0 20px;
+  color: #ff0000;
+}
+#github-ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 /* Main */

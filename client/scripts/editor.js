@@ -2,12 +2,10 @@
 
 // Tasks
 // allow formulae as input (except for names)
+// dynamic fields
 // gui which asks for name & type when creating an object
 // save button
-// dynamic fields
-// name availability
-// login/register error messages (server-side errors e.g. email already in use)
-// change css slightly so it looks like the same with/without reset.css
+// start working on the lobby and play screens
 
 // use this["name"] instead of this.name so nothing breaks if the code is ever minified
 
@@ -247,6 +245,7 @@ $(document).ready(function(event) {
       parent = selected.parent;
     }
     parent.addChild(object);
+    object.select();
     scene.draw();
   });
 

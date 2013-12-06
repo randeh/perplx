@@ -8,6 +8,7 @@ $(document).ready(function(event) {
     if(closeCurrentWindow !== null) {
       closeCurrentWindow();
     }
+    $("#github-ribbon").show();
     $("body").addClass("prelogin");
     $("#home-container").addClass("login").show();
     $("#login-pane").show();
@@ -16,12 +17,13 @@ $(document).ready(function(event) {
   };
 
   var closeLogin = function() {
+    $("#github-ribbon").hide();
     $("body").removeClass("prelogin");
     $("#home-container").removeClass("login").hide();
     $("#login-pane").hide();
     $(".login-field").val("");
     $("#login-button").attr("disabled", "disabled");
-    // TODO Clear error messages
+    $("#login-error").text("");
     closeCurrentWindow = null;
   };
 
@@ -57,8 +59,9 @@ $(document).ready(function(event) {
 
   callbacks.loginFailure = function(data) {
     openLogin();
-    // TODO Display appropriate error message(s)
-    alert(JSON.stringify(data)); // TEMP
+    $("#login-email").val(data.email);
+    $("#login-password").val(data.password);
+    $("#login-error").text(data.message);
   };
 
   var validateFields = function() {

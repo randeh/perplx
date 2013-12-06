@@ -9,6 +9,7 @@ $(document).ready(function(event) {
     if(closeCurrentWindow !== null) {
       closeCurrentWindow();
     }
+    $("#github-ribbon").show();
     $("body").addClass("prelogin");
     $("#home-container").show();
     $("#loading-spinner").show();
@@ -16,6 +17,7 @@ $(document).ready(function(event) {
   };
 
   var closeLoading = function() {
+    $("#github-ribbon").hide();
     $("body").removeClass("prelogin");
     $("#home-container").hide();
     $("#loading-spinner").hide();

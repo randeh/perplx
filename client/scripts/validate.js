@@ -2,7 +2,7 @@
 
 (function(exports) {
 
-  var nameRegex = /^[A-Z]{3,12}/i;
+  var nameRegex = /^[A-Z]{3,12}$/i;
   var passwordRegex = /^[A-Z0-9!$%&*@#~?.,]{6,15}$/i;
   var emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 

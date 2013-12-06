@@ -14,7 +14,7 @@
 
   module.exports.register = function(connection, data) {
     if(!validate.isValidName(data.name) || !validate.isValidEmail(data.email) || !validate.isValidPassword(data.password)) {
-      clients.messageClient(connection, "registerFailure", {});
+      clients.messageClient(connection, "registerFailure", data);
       return;
     }
     bcrypt.hash(data.password, 10, function(err, hash) {
@@ -31,7 +31,8 @@
           if(err) {
             // TODO Something has gone wrong
           } else if(existingAccount) {
-            clients.messageClient(connection, "registerFailure", {});
+            data.message = "Email address already in use.";
+            clients.messageClient(connection, "registerFailure", data);
           } else {
             db.accounts.insert(account, function(err, inserted) {
               if(err || !inserted) {
@@ -39,10 +40,7 @@
               } else {
                 connection.session = account.session;
                 clients.addClient(connection);
-                var data = {
-                  session: account.session
-                };
-                clients.messageClient(connection, "loginSuccess", data);
+                clients.messageClient(connection, "loginSuccess", { session: account.session });
               }
             });
           }
@@ -56,7 +54,8 @@
       if(err) {
         // TODO Something has gone wrong
       } else if(!account) {
-        clients.messageClient(connection, "loginFailure", { message: "Invalid email address." });
+        data.message = "Invalid email address.";
+        clients.messageClient(connection, "loginFailure", data);
       } else {
         bcrypt.compare(data.password, account.password, function(err, match) {
           if(err) {
@@ -72,14 +71,12 @@
               } else {
                 connection.session = session;
                 clients.addClient(connection);
-                var data = {
-                  session: session
-                };
-                clients.messageClient(connection, "loginSuccess", data);
+                clients.messageClient(connection, "loginSuccess", { session: session });
               }
             });
           } else {
-            clients.messageClient(connection, "loginFailure", { message: "Invalid password." });
+            data.message = "Invalid password.";
+            clients.messageClient(connection, "loginFailure", data);
           }
         });
       }
@@ -95,10 +92,7 @@
       } else {
         connection.session = account.session;
         clients.addClient(connection);
-        var data = {
-          session: account.session
-        };
-        clients.messageClient(connection, "loginSuccess", data);
+        clients.messageClient(connection, "loginSuccess", { session: account.session });
       }
     });
   };
@@ -108,6 +102,18 @@
     db.accounts.update({ session: connection.session }, { $unset: { session: 1 } });
     delete connection.session;
     clients.messageClient(connection, "logoutSuccess", {});
+  };
+
+  module.exports.checkAvailability = function(connection, data) {
+    db.accounts.findOne({ name: data.name }, function(err, account) {
+      if(err) {
+        // TODO Something has gone wrong
+      } else if(!account) {
+        clients.messageClient(connection, "nameAvailable", data);
+      } else {
+        clients.messageClient(connection, "nameUnavailable", data);
+      }
+    });
   };
 
 }());

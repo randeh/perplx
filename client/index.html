@@ -15,6 +15,7 @@
     <script src="scripts/editor.js"></script>
   </head>
   <body>
+    <a href="https://github.com/randeh" target="_blank"><img id="github-ribbon" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
     <div id="home-container">
       <img id="loading-spinner" src="images/loading-spinner.gif">
       <div class="home-pane" id="login-pane">
@@ -24,6 +25,7 @@
             <label class="home-label" for="login-email">Email Address:</label><input type="text" class="home-field login-field" id="login-email">
             <label class="home-label" for="login-password">Password:</label><input type="password" class="home-field login-field" id="login-password">
           </fieldset>
+          <div id="login-error"></div>
           <input type="button" value="Log in" class="home-button" id="login-button" disabled>
         </div>
         <div class="home-right">
@@ -40,12 +42,18 @@
             <label class="home-label" for="register-password">Password:</label><input type="password" class="home-field register-field" id="register-password">
             <label class="home-label" for="register-password2">Re-enter Password:</label><input type="password" class="home-field register-field" id="register-password2">
           </fieldset>
+          <div id="register-error"></div>
           <input type="button" value="Sign up" class="home-button" id="register-button" disabled>
         </div>
         <div class="home-right">
           <p>Already have an account? <a href="#" id="register-login">Log in</a>.</p>
-          <p class="register-tip" id="register-tip-name">Display names can be between 3 and 12 alphabetic characters long.</p>
-          <p class="register-tip" id="register-tip-password">Passwords can be between 6 and 15 characters long. Most punctuation and alphanumeric characters are accepted.</p>
+          <div class="register-tip" id="register-tip-name">
+            <p>Display names can be between 3 and 12 alphabetic characters long.</p>
+            <p class="register-tip register-tip-availability" id="register-tip-available">This name is available.</p>
+            <p class="register-tip register-tip-availability" id="register-tip-unavailable">This name is not available</p>
+          </div>
+          <p class="register-tip" id="register-tip-email">Your email address will be used for identification when logging in, we will not send you any email unless you request a password reset.</p>
+          <p class="register-tip" id="register-tip-password">Passwords can be between 6 and 15 characters long. Most punctuation, and alphanumeric characters are accepted.</p>
         </div>
       </div>
     </div>
@@ -54,6 +62,9 @@
         <h1>Lobby</h1>
         <input type="button" value="Log out" id="logout-button">
         <a href="#" id="lobby-editor">Editor</a>
+      </div>
+      <div class="main-pane" id="play-pane">
+        <h1>Play</h1>
       </div>
       <div class="main-pane" id="editor-pane">
         <div id="editor-canvas-holder"></div>
@@ -72,9 +83,6 @@
             <input type="button" value="Publish" id="editor-delete-button">
           </div>
         </div>
-      </div>
-      <div class="main-pane" id="play-pane">
-        <h1>Play</h1>
       </div>
     </div>
   </body>

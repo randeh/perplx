@@ -63,6 +63,9 @@ wsServer.on("request", function(request) {
         case "checkSession":
           accounts.checkSession(connection, data);
           break;
+        case "checkAvailability":
+          accounts.checkAvailability(connection, data);
+          break;
         default:
           // Unexpected action
           break;

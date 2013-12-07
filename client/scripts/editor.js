@@ -3,15 +3,23 @@
 // Tasks
 // allow formulae as input (except for names)
 // dynamic fields
-// gui which asks for name & type when creating an object
 // save button
 // start working on the lobby and play screens
+// player, keyboard & mouse objects
+
+// move new-menu css to main.css
+// validate object names inputted by user (in the new menu)
+// validate input from inspector fields based on their type
 
 // use this["name"] instead of this.name so nothing breaks if the code is ever minified
 
 var openEditor;
 
 $(document).ready(function(event) {
+
+  var objects = {};
+
+  var objectTypes = [ "Box", "Group" ];
 
   var fields = [
     { name: "name",            display: "Name",             htmlType: "text",   type: "string"  },
@@ -34,7 +42,7 @@ $(document).ready(function(event) {
     $("#main-container").show();
     $("#editor-pane").show();
     nextAvailableId = 0;
-    scene = new Scene("myGame", 700, 500, "#eeeeee");
+    scene = new objects.Scene("Game");
     selected = null;
     closeCurrentWindow = closeEditor;
   };
@@ -51,7 +59,7 @@ $(document).ready(function(event) {
     closeCurrentWindow = null;
   };
 
-  var Object = function(name) {
+  objects.Object = function(name) {
     if(arguments.length == 0) {
       return;
     }
@@ -69,17 +77,17 @@ $(document).ready(function(event) {
       this.listItem.prepend(this.button).append(this.childrenList);
     }
   };
-  Object.prototype.isContainer = false;
-  Object.prototype.setName = function(name) {
+  objects.Object.prototype.isContainer = false;
+  objects.Object.prototype.setName = function(name) {
     this.name.value = name;
     this.label.text(this.name.value + " : " + this.type);
   };
-  Object.prototype.addChild = function(child) {
+  objects.Object.prototype.addChild = function(child) {
     this.children.push(child);
     this.childrenList.append(child.listItem);
     child.parent = this;
   };
-  Object.prototype.select = function() {
+  objects.Object.prototype.select = function() {
     if(selected !== null) {
       selected.deselect();
     }
@@ -92,14 +100,14 @@ $(document).ready(function(event) {
     var obj = this;
     this.label.off("click").click(function(event) { obj.deselect() });
   };
-  Object.prototype.deselect = function() {
+  objects.Object.prototype.deselect = function() {
     selected = null;
     this.label.removeClass("selected");
     $("#editor-properties").empty();
     var obj = this;
     this.label.off("click").click(function(event) { obj.select() });
   };
-  Object.prototype.inspect = function() {
+  objects.Object.prototype.inspect = function() {
     var obj = this;
     for(var i = 0; i < fields.length; i++) {
       var field = fields[i];
@@ -124,23 +132,39 @@ $(document).ready(function(event) {
       }
     }
   };
-  Object.prototype.expand = function() {
+  objects.Object.prototype.expand = function() {
     this.childrenList.show();
     this.button.prop("src", "images/minus.png");
     var obj = this;
     this.button.off("click").click(function(event) { obj.collapse() });
   };
-  Object.prototype.collapse = function() {
-    // Collapse all children?
-    // If selected object is inside, deselect it?
+  objects.Object.prototype.collapse = function() {
+    for(var i = 0; i < this.children.length; i++) {
+      var child = this.children[i];
+      if(child == selected) {
+        child.deselect();
+      }
+      if(child.isContainer) {
+        child.collapse();
+      }
+    }
     this.childrenList.hide();
     this.button.prop("src", "images/plus.png");
     var obj = this;
     this.button.off("click").click(function(event) { obj.expand() });
   };
 
-  var Scene = function(name, width, height, backgroundColor) {
-    Object.apply(this, [name]);
+  objects.Scene = function(name, width, height, backgroundColor) {
+    objects.Object.apply(this, [name]);
+    if(width === undefined) {
+      width = 700;
+    }
+    if(height === undefined) {
+      height = 500;
+    }
+    if(backgroundColor === undefined) {
+      backgroundColor = "#eeeeee";
+    }
     $("#editor-tree-list").append(this.listItem);
     this.canvas = $(document.createElement("canvas")).attr("id", "editor-canvas");
     $("#editor-canvas-holder").append(this.canvas);
@@ -158,82 +182,104 @@ $(document).ready(function(event) {
     this.height = { "value": height, "method": "setHeight" };
     this.backgroundColor = { "value": backgroundColor, "method": "setBackgroundColor" };
   };
-  Scene.prototype = new Object();
-  Scene.prototype.constructor = Scene;
-  Scene.prototype.type = "Scene";
-  Scene.prototype.isContainer = true;
-  Scene.prototype.draw = function() {
+  objects.Scene.prototype = new objects.Object();
+  objects.Scene.prototype.constructor = objects.Scene;
+  objects.Scene.prototype.type = "Scene";
+  objects.Scene.prototype.isContainer = true;
+  objects.Scene.prototype.draw = function() {
     this.context.clearRect(0, 0, this.width.value, this.height.value);
     for(var i = 0; i < this.children.length; i++) {
       this.children[i].draw(this.context);
     }
   };
-  Scene.prototype.setWidth = function(width) {
+  objects.Scene.prototype.setWidth = function(width) {
     this.width.value = width;
     this.canvas.prop({ "width": width });
     this.canvas.css({ "margin-left": -width / 2 });
   };
-  Scene.prototype.setHeight = function(height) {
+  objects.Scene.prototype.setHeight = function(height) {
     this.height.value = height;
     this.canvas.prop({ "height": height });
     this.canvas.css({ "margin-top": -height / 2 });
   };
-  Scene.prototype.setBackgroundColor = function(backgroundColor) {
+  objects.Scene.prototype.setBackgroundColor = function(backgroundColor) {
     this.backgroundColor.value = backgroundColor;
     this.canvas.css({ "background-color": backgroundColor });
   };
 
-  var Group = function(name) {
-    Object.apply(this, [name]);
+  objects.Group = function(name) {
+    objects.Object.apply(this, [name]);
   };
-  Group.prototype = new Object();
-  Group.prototype.constructor = Group;
-  Group.prototype.type = "Group";
-  Group.prototype.isContainer = true;
-  Group.prototype.draw = function(context) {
+  objects.Group.prototype = new objects.Object();
+  objects.Group.prototype.constructor = objects.Group;
+  objects.Group.prototype.type = "Group";
+  objects.Group.prototype.isContainer = true;
+  objects.Group.prototype.draw = function(context) {
     for(var i = 0; i < this.children.length; i++) {
       this.children[i].draw(context);
     }
   };
 
-  var Rect = function(name, backgroundColor, x, y, width, height) {
-    Object.apply(this, [name]);
+  objects.Box = function(name, backgroundColor, x, y, width, height) {
+    objects.Object.apply(this, [name]);
+    if (backgroundColor === undefined) {
+      backgroundColor = "#000000";
+    }
+    if (x === undefined) {
+      x = 0;
+    }
+    if (y === undefined) {
+      y = 0;
+    }
+    if (width === undefined) {
+      width = 100;
+    }
+    if (height === undefined) {
+      height = 100;
+    }
     this.backgroundColor = { "value": backgroundColor };
     this.x = { "value": x };
     this.y = { "value": y };
     this.width = { "value": width };
     this.height = { "value": height };
   };
-  Rect.prototype = new Object();
-  Rect.prototype.constructor = Rect;
-  Rect.prototype.type = "Rect";
-  Rect.prototype.draw = function(context) {
+  objects.Box.prototype = new objects.Object();
+  objects.Box.prototype.constructor = objects.Box;
+  objects.Box.prototype.type = "Box";
+  objects.Box.prototype.draw = function(context) {
     context.fillStyle = this.backgroundColor.value;
     context.fillRect(this.x.value, this.y.value, this.width.value, this.height.value);
   };
 
-  var getRandomColor = function() {
-    var letters = "0123456789abcdef".split("");
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * letters.length)];
+  var openNewMenu = function() {
+    for(var i = 0; i < objectTypes.length; i++) {
+      var type = objectTypes[i];
+      var option = $(document.createElement("option")).val(type).text(type);
+      $("#editor-new-type").append(option);
     }
-    return color;
+    $("#editor-new-menu").show();
+    $("#editor-new-name").focus();
   };
 
-  $("#editor-new-button").click(function(event) {
-    var type = prompt("Type", "Rect");
-    var name = prompt("Name", "");
-    var object;
-    if(type == "Rect") {
-      var size = 100;
-      var color = getRandomColor();
-      var x = Math.round(Math.random() * (scene.width.value - size));
-      var y = Math.round(Math.random() * (scene.height.value - size));
-      object = new Rect(name, color, x, y, size, size);
-    } else if(type == "Group") {
-      object = new Group(name);
-    } else {
+  var closeNewMenu = function() {
+    $("#editor-new-type").empty();
+    $(".editor-new-field").val("");
+    $("#editor-new-menu").hide();
+  };
+
+  var newObject = function() {
+    var name = $("#editor-new-name").val();
+    // TODO Validate name (make a new function in validate.js)
+    var type = $("#editor-new-type").val();
+    closeNewMenu();
+    var object = null;
+    for(var i = 0; i < objectTypes.length; i++) {
+      if(objectTypes[i] == type) {
+        object = new objects[type](name);
+        break;
+      }
+    }
+    if(object === null) {
       return;
     }
     var parent;
@@ -245,13 +291,23 @@ $(document).ready(function(event) {
       parent = selected.parent;
     }
     parent.addChild(object);
+    parent.expand();
     object.select();
     scene.draw();
+  };
+
+  $("#editor-new-button").click(openNewMenu);
+  $("#editor-new-cancel").click(closeNewMenu);
+  $("#editor-new-ok").click(newObject);
+  $(".editor-new-field").keypress(function(event) {
+    if(event.which == 13) {
+      newObject();
+    }
   });
 
-  // If a group is deleted, there will be circular references between .children and .parent possibly preventing garbage collection
+  // TODO If a group is deleted, there will be circular references between .children and .parent possibly preventing garbage collection
   $("#editor-delete-button").click(function(event) {
-    if(selected !== "undefined" && selected.type != "Scene") {
+    if(selected !== undefined && selected.type != objects.Scene.type) {
       var object = selected;
       object.deselect();
       object.parent.children = jQuery.grep(object.parent.children, function(arrayItem) {

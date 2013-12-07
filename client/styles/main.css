@@ -22,6 +22,8 @@ h1 {
 h2 {
   font-size: 15px;
   line-height: 25px;
+  font-weight: bold;
+  margin: 5px 0;
 }
 p {
   margin: 13px 0;
@@ -97,7 +99,7 @@ body.prelogin {
   margin-right: 36px;
   float: right;
 }
-#home-container, .home-pane, #loading-spinner, .register-tip {
+#home-container, .home-pane, #loading-spinner, .register-tip, #github-ribbon {
   display: none;
 }
 #login-error, #register-error {
@@ -112,7 +114,7 @@ body.prelogin {
 }
 
 /* Main */
-#main-container, .main-pane {
+#main-container, .main-pane, #editor-new-menu {
   display: none;
 }
 
@@ -153,4 +155,7 @@ ol.tree img {
 }
 ol.tree span.selected {
   background-color: #cccccc;
+}
+#editor-properties label {
+  margin-right: 5px;
 }

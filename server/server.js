@@ -34,7 +34,8 @@ wsServer.on("request", function(request) {
 
   connection.on("message", function(message) {
     if(message.type !== "utf8") {
-      // Received message in unsupported format
+      console.log("Received message in unsupported format.");
+      return;
     }
     var messageContent = JSON.parse(message.utf8Data);
     var action = messageContent.action;
@@ -46,7 +47,7 @@ wsServer.on("request", function(request) {
             accounts.logout(connection, data);
             break;
           default:
-            // Unexpected action
+            console.log("Unexpected action.");
             break;
         }
       } else {
@@ -67,7 +68,7 @@ wsServer.on("request", function(request) {
           accounts.checkAvailability(connection, data);
           break;
         default:
-          // Unexpected action
+          console.log("Unexpected action.");
           break;
       }
     }

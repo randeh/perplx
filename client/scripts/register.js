@@ -44,14 +44,12 @@ $(document).ready(function(event) {
     openLoading();
   };
 
-
+  $("#register-button").click(register);
   $(".register-field").keypress(function(event) {
     if(event.which == 13) {
       register();
     }
   });
-
-  $("#register-button").click(register);
 
   $("#register-login").click(function(event) {
     openLogin();

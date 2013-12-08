@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="styles/reset.css">
     <link rel="stylesheet" type="text/css" href="styles/main.css">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/socket.js"></script>
     <script src="scripts/validate.js"></script>
@@ -13,6 +13,7 @@
     <script src="scripts/login.js"></script>
     <script src="scripts/lobby.js"></script>
     <script src="scripts/editor.js"></script>
+    <script src="scripts/play.js"></script>
   </head>
   <body>
     <a href="https://github.com/randeh" target="_blank"><img id="github-ribbon" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
@@ -62,10 +63,9 @@
         <h1>Lobby</h1>
         <input type="button" value="Log out" id="logout-button">
         <a href="#" id="lobby-editor">Editor</a>
+        <div id="lobby-levels"></div>
       </div>
-      <div class="main-pane" id="play-pane">
-        <h1>Play</h1>
-      </div>
+      <div class="main-pane" id="play-pane" style="position: absolute; left: 0%; top: 0%; width: 100%; height: 100%;"></div>
       <div class="main-pane" id="editor-pane">
         <div id="editor-canvas-holder"></div>
         <div id="editor-sidebar">
@@ -78,9 +78,10 @@
           </div>
           <div id="editor-properties"></div>
           <div id="editor-controls">
-            <input type="button" value="Save" id="editor-new-button">
-            <input type="button" value="Test" id="editor-delete-button">
-            <input type="button" value="Publish" id="editor-delete-button">
+            <input type="button" value="Save" id="editor-save-button">
+            <input type="button" value="Test" id="editor-test-button">
+            <input type="button" value="Publish" id="editor-publish-button">
+            <input type="button" value="Exit" id="editor-exit-button">
           </div>
         </div>
         <div id="editor-new-menu">

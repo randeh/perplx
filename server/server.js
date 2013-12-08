@@ -2,6 +2,7 @@ var WebSocketServer = require("websocket").server;
 var http = require("http");
 var accounts = require("./accounts");
 var clients = require("./clients");
+var levels = require("./levels");
 
 var server = http.createServer(function(request, response) {
   console.log((new Date()) + " Received request for " + request.url);
@@ -45,6 +46,15 @@ wsServer.on("request", function(request) {
         switch(action) {
           case "logout":
             accounts.logout(connection, data);
+            break;
+          case "saveLevel":
+            levels.save(connection, data);
+            break;
+          case "getLevels":
+            levels.get(connection, data);
+            break;
+          case "playLevel":
+            levels.play(connection, data);
             break;
           default:
             console.log("Unexpected action.");

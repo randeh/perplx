@@ -22,7 +22,7 @@ $(document).ready(function(event) {
     $("#home-container").removeClass("login").hide();
     $("#login-pane").hide();
     $(".login-field").val("");
-    $("#login-button").attr("disabled", "disabled");
+    $("#login-button").prop("disabled", true);
     $("#login-error").text("");
     closeCurrentWindow = null;
   };
@@ -68,10 +68,10 @@ $(document).ready(function(event) {
     var emailValid = validate.isValidEmail($("#login-email").val());
     var passwordValid = validate.isValidPassword($("#login-password").val());
     if(emailValid && passwordValid) {
-      $("#login-button").removeAttr("disabled");
+      $("#login-button").prop("disabled", false);
       return true;
     } else {
-      $("#login-button").attr("disabled", "disabled");
+      $("#login-button").prop("disabled", true);
       return false;
     }
   }

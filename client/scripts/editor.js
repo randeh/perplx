@@ -3,9 +3,15 @@
 // Tasks
 // allow formulae as input (except for names)
 // dynamic fields
-// save button
-// start working on the lobby and play screens
+// different shapes and fields
 // player, keyboard & mouse objects
+// simple user input e.g. mouse control
+
+// next:
+//  save non-destructively
+//  save object types
+//  move object definitions & lists to their own file
+//  make saved levels editable & draw shapes on the play screen
 
 // move new-menu css to main.css
 // validate object names inputted by user (in the new menu)
@@ -36,7 +42,7 @@ $(document).ready(function(event) {
   var selected;
 
   openEditor = function() {
-    if(closeCurrentWindow !== null) {
+    if(closeCurrentWindow != null) {
       closeCurrentWindow();
     }
     $("#main-container").show();
@@ -88,7 +94,7 @@ $(document).ready(function(event) {
     child.parent = this;
   };
   objects.Object.prototype.select = function() {
-    if(selected !== null) {
+    if(selected != null) {
       selected.deselect();
     }
     selected = this;
@@ -111,14 +117,14 @@ $(document).ready(function(event) {
     var obj = this;
     for(var i = 0; i < fields.length; i++) {
       var field = fields[i];
-      if(this[field.name] !== undefined) {
+      if(this[field.name] != undefined) {
         var id = field.name + this.id;
         var label = $(document.createElement("label")).prop("for", id).text(field.display + ":");
         var input = $(document.createElement("input")).prop({ "id": id, "type": field.htmlType, "value": this[field.name].value });
         input.on("input", { field: field, input: input }, function(event) {
           var field = event.data.field;
           var input = event.data.input;
-          if(obj[field.name].method !== undefined) {
+          if(obj[field.name].method != undefined) {
             obj[obj[field.name].method](input.val());
           } else {
             obj[field.name].value = input.val();
@@ -156,17 +162,17 @@ $(document).ready(function(event) {
 
   objects.Scene = function(name, width, height, backgroundColor) {
     objects.Object.apply(this, [name]);
-    if(width === undefined) {
+    if(width == undefined) {
       width = 700;
     }
-    if(height === undefined) {
+    if(height == undefined) {
       height = 500;
     }
-    if(backgroundColor === undefined) {
+    if(backgroundColor == undefined) {
       backgroundColor = "#eeeeee";
     }
     $("#editor-tree-list").append(this.listItem);
-    this.canvas = $(document.createElement("canvas")).attr("id", "editor-canvas");
+    this.canvas = $(document.createElement("canvas"));
     $("#editor-canvas-holder").append(this.canvas);
     this.canvas.css({
       "position": "absolute",
@@ -222,19 +228,19 @@ $(document).ready(function(event) {
 
   objects.Box = function(name, backgroundColor, x, y, width, height) {
     objects.Object.apply(this, [name]);
-    if (backgroundColor === undefined) {
+    if (backgroundColor == undefined) {
       backgroundColor = "#000000";
     }
-    if (x === undefined) {
+    if (x == undefined) {
       x = 0;
     }
-    if (y === undefined) {
+    if (y == undefined) {
       y = 0;
     }
-    if (width === undefined) {
+    if (width == undefined) {
       width = 100;
     }
-    if (height === undefined) {
+    if (height == undefined) {
       height = 100;
     }
     this.backgroundColor = { "value": backgroundColor };
@@ -279,11 +285,11 @@ $(document).ready(function(event) {
         break;
       }
     }
-    if(object === null) {
+    if(object == null) {
       return;
     }
     var parent;
-    if(selected === null) {
+    if(selected == null) {
       parent = scene;
     } else if(selected.isContainer) {
       parent = selected;
@@ -307,7 +313,7 @@ $(document).ready(function(event) {
 
   // TODO If a group is deleted, there will be circular references between .children and .parent possibly preventing garbage collection
   $("#editor-delete-button").click(function(event) {
-    if(selected !== undefined && selected.type != objects.Scene.type) {
+    if(selected != null && selected.type != objects.Scene.prototype.type) {
       var object = selected;
       object.deselect();
       object.parent.children = jQuery.grep(object.parent.children, function(arrayItem) {
@@ -316,6 +322,41 @@ $(document).ready(function(event) {
       object.listItem.empty().remove();
       scene.draw();
     }
-  })
+  });
+
+  var stripUnwantedFields = function(object) {
+    delete object.label;
+    delete object.listItem;
+    delete object.button;
+    delete object.childrenList;
+    delete object.canvas;
+    delete object.context;
+    delete object.parent;
+    if(object.isContainer) {
+      for(var i = 0; i < object.children.length; i++) {
+        stripUnwantedFields(object.children[i]);
+      }
+    }
+  };
+
+  $("#editor-save-button").click(function(event) {
+    stripUnwantedFields(scene);
+    // also strip "method" fields?
+    var data = {
+      "name": scene.name.value,
+      "level": scene
+    };
+    messageServer("saveLevel", data);
+    // ideally the save button shouldn't destroy 'scene' and exit the editor but that's okay for now
+    openLoading();
+  });
+
+  callbacks.levelSaved = function(data) {
+    openLobby();
+  };
+
+  $("#editor-exit-button").click(function(event) {
+    openLobby();
+  });
 
 });

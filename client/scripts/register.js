@@ -24,7 +24,7 @@ $(document).ready(function(event) {
     $("#home-container").removeClass("register").hide();
     $("#register-pane").hide();
     $(".register-field").val("").removeClass("invalid");
-    $("#register-button").attr("disabled", "disabled");
+    $("#register-button").prop("disabled", true);
     $(".register-tip").hide();
     $("#register-name").removeClass("unavailable");
     $("#register-error").text("");
@@ -124,10 +124,10 @@ $(document).ready(function(event) {
       }
     }
     if(valid[0] && valid[1] && valid[2] && valid[3] && nameAvailable) {
-      $("#register-button").removeAttr("disabled");
+      $("#register-button").prop("disabled", false);
       return true;
     } else {
-      $("#register-button").attr("disabled", "disabled");
+      $("#register-button").prop("disabled", true);
       return false;
     }
   };

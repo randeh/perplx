@@ -2,6 +2,8 @@
 
 var closeCurrentWindow = null;
 var openLoading;
+var scene;
+var mode;
 
 $(document).ready(function(event) {
 

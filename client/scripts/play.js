@@ -2,16 +2,13 @@
 
 $(document).ready(function(event) {
 
-  callbacks.openLevel = function(data) {
+  var openPlay = function() {
     if(closeCurrentWindow !== null) {
       closeCurrentWindow();
     }
     $("#main-container").show();
     $("#play-pane").show();
     mode = "play";
-    scene = buildLevel(data);
-    $("#play-pane").append(scene.canvas);
-    scene.draw();
     closeCurrentWindow = closePlay;
   };
 
@@ -23,15 +20,11 @@ $(document).ready(function(event) {
     closeCurrentWindow = null;
   };
 
-  var buildLevel = function(data) {
-    var object = new objects[data.type](data.properties);
-    if(object.isContainer) {
-      for(var i = 0; i < data.children.length; i++) {
-        var child = buildLevel(data.children[i]);
-        object.addChild(child);
-      }
-    }
-    return object;
+  callbacks.openLevel = function(data) {
+    openPlay();
+    scene = buildLevel(JSON.parse(data));
+    $("#play-pane").append(scene.canvas);
+    scene.draw();
   };
 
 });

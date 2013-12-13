@@ -3,8 +3,8 @@
   <head>
     <title>Perplx</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="styles/reset.css">
-    <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/main.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/socket.js"></script>
@@ -61,12 +61,24 @@
     </div>
     <div id="main-container">
       <div class="main-pane" id="lobby-pane">
-        <h1>Lobby</h1>
+        <span>Display levels:</span>
+        <a href="#" class="lobby-level-filter" id="lobby-all-levels">All Levels</a> | <a href="#" class="lobby-level-filter" id="lobby-my-levels">My Levels</a>
+        <a href="#" id="lobby-editor">Level Editor</a>
         <input type="button" value="Log out" id="logout-button">
-        <a href="#" id="lobby-editor">Editor</a>
-        <div id="lobby-levels"></div>
+        <table id="lobby-levels-table">
+          <thead>
+            <tr>
+              <th id="lobby-level-name">Level Name</th>
+              <th id="lobby-level-completed">Completed</th>
+              <th id="lobby-level-rating">Rating</th>
+              <th id="lobby-level-players">Players</th>
+              <th id="lobby-level-buttons"></th>
+            </tr>
+          </thead>
+          <tbody id="lobby-levels"></tbody>
+        </table>
       </div>
-      <div class="main-pane" id="play-pane" style="position: absolute; left: 0%; top: 0%; width: 100%; height: 100%;"></div>
+      <div class="main-pane" id="play-pane"></div>
       <div class="main-pane" id="editor-pane">
         <div id="editor-canvas-holder"></div>
         <div id="editor-sidebar">
@@ -86,14 +98,14 @@
           </div>
         </div>
         <div id="editor-new-menu">
-          <div style="position: absolute; left: 0%; top: 0%; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);"></div>
-          <div id="editor-new-box" style="position: absolute; left: 50%; top: 50%; width: 210px; margin-left: -115px; height: 116px; margin-top: -68px; padding: 10px; background-color: white; border-radius: 8px; box-shadow: 8px 8px 8px #888888;">
+          <div id="editor-new-background"></div>
+          <div id="editor-new-box">
             <h2>New Object</h2>
-            <label for="editor-new-name" style="margin-right: 5px;">Name:</label><input type="text" class="editor-new-field" id="editor-new-name">
-            <label for="editor-new-type" style="margin-right: 5px;">Type:</label><select class="editor-new-field" id="editor-new-type"></select>
-            <div id="editor-new-buttons" style="text-align: right; margin-top: 5px;">
-              <input type="button" value="OK" id="editor-new-ok" style="display: inline-block;">
-              <input type="button" value="Cancel" id="editor-new-cancel" style="display: inline-block;">
+            <label class="editor-new-label" for="editor-new-name">Name:</label><input type="text" class="editor-new-field" id="editor-new-name">
+            <label class="editor-new-label" for="editor-new-type">Type:</label><select class="editor-new-field" id="editor-new-type"></select>
+            <div id="editor-new-buttons">
+              <input type="button" value="OK" id="editor-new-ok">
+              <input type="button" value="Cancel" id="editor-new-cancel">
             </div>
           </div>
         </div>

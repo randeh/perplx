@@ -2,36 +2,28 @@
 
 // Tasks
 // allow formulae as input (except for names)
-// dynamic fields
-// different shapes and fields
+// dynamic fields & triggers
+// more shapes and fields
 // player, keyboard & mouse objects
 // simple user input e.g. mouse control
-
-// improve saving:
-//  make saved levels loadable in the editor
-//  on server-side, make sure overwriting works (but only if same owner)
-
-// move css to main.css
-// validate object names inputted by user (in the new menu)
-// validate input from inspector fields based on their type
+// publishing/testing levels
+// rating
+// deleting/forking
 
 // use this["name"] instead of this.name so nothing breaks if the code is ever minified
 
-var openEditor;
+var openNewEditor;
 var selected;
 
 $(document).ready(function(event) {
 
-  openEditor = function() {
+  var openEditor = function() {
     if(closeCurrentWindow != null) {
       closeCurrentWindow();
     }
     $("#main-container").show();
     $("#editor-pane").show();
     mode = "editor";
-    scene = new objects.Scene({ name: { value: "Game" } });
-    $("#editor-tree-list").append(scene.listItem);
-    $("#editor-canvas-holder").append(scene.canvas);
     selected = null;
     closeCurrentWindow = closeEditor;
   };
@@ -46,6 +38,21 @@ $(document).ready(function(event) {
     scene = null;
     selected = null;
     closeCurrentWindow = null;
+  };
+
+  openNewEditor = function() {
+    openEditor();
+    scene = new objects.Scene({ name: { value: "Game" } });
+    $("#editor-tree-list").append(scene.listItem);
+    $("#editor-canvas-holder").append(scene.canvas);
+  };
+
+  callbacks.editLevel = function(data) {
+    openEditor();
+    scene = buildLevel(JSON.parse(data));
+    $("#editor-tree-list").append(scene.listItem);
+    $("#editor-canvas-holder").append(scene.canvas);
+    scene.draw();
   };
 
   var openNewMenu = function() {
@@ -106,7 +113,6 @@ $(document).ready(function(event) {
     }
   });
 
-  // TODO If a group is deleted, there will be circular references between .children and .parent possibly preventing garbage collection
   $("#editor-delete-button").click(function(event) {
     if(selected != null && selected.type != objects.Scene.prototype.type) {
       var object = selected;
@@ -136,6 +142,7 @@ $(document).ready(function(event) {
     var sceneCopy = copyObject(scene);
     var data = {
       "name": scene.properties.name.value,
+      "players": 1,
       "level": sceneCopy
     };
     messageServer("saveLevel", data);
@@ -144,6 +151,11 @@ $(document).ready(function(event) {
   callbacks.levelSaved = function(data) {
     // TEMP
     alert("Level saved.");
+  };
+
+  callbacks.levelNotSaved = function(data) {
+    // TEMP
+    alert(data.message);
   };
 
   $("#editor-exit-button").click(function(event) {

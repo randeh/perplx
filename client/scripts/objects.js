@@ -25,6 +25,8 @@ var fieldTypes = {
   color:   { htmlType: "color",  validator: function() { return true; } }
 };
 
+var buildLevel;
+
 $(document).ready(function(event) {
 
   objects.Object = function(properties) {
@@ -100,24 +102,29 @@ $(document).ready(function(event) {
       var fieldProperties = fields[field];
       var id = "inspector-field-" + field;
       var label = $(document.createElement("label")).prop("for", id).text(fieldProperties.displayName + ":");
-      var input = $(document.createElement("input")).prop({ "id": id, "type": fieldTypes[fieldProperties.type].htmlType, "value": this.properties[field].value });
+      var input = $(document.createElement("input")).prop({ "id": id, "type": fieldTypes[fieldProperties.type].htmlType });
+      input.val(this.properties[field].value).data("lastValue", this.properties[field].value);
       input.on("input", { obj: this, field: field, fieldProperties: fieldProperties, input: input }, function(event) {
         var obj = event.data.obj;
         var field = event.data.field;
         var fieldProperties = event.data.fieldProperties;
         var input = event.data.input;
         var val = input.val();
-        // TODO check if val validates using fieldTypes[fieldProperties.type].validator
-        // if it doesn't:
-        //   use fieldProperties.defaultValue instead of val
-        //   input.val(fieldProperties.defaultValue)
-        // unless the input is still in focus
+        if(fieldTypes[fieldProperties.type].validator(val)) {
+          input.data("lastValue", val);
+        }
         obj.properties[field].value = val;
         if("method" in fieldProperties) {
           obj[fieldProperties.method](val);
         }
         if(field != "name") {
           scene.draw();
+        }
+      }).blur({ fieldProperties: fieldProperties, input: input }, function(event) {
+        var fieldProperties = event.data.fieldProperties;
+        var input = event.data.input;
+        if(!fieldTypes[fieldProperties.type].validator(input.val())) {
+          input.val(input.data("lastValue")).trigger("input");
         }
       });
       var container = $(document.createElement("div")).append(label).append(input);
@@ -204,6 +211,17 @@ $(document).ready(function(event) {
   objects.Box.prototype.draw = function(context) {
     context.fillStyle = this.properties.shapeBackgroundColor.value;
     context.fillRect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
+  };
+
+  buildLevel = function(data) {
+    var object = new objects[data.type](data.properties);
+    if(object.isContainer) {
+      for(var i = 0; i < data.children.length; i++) {
+        var child = buildLevel(data.children[i]);
+        object.addChild(child);
+      }
+    }
+    return object;
   };
 
 });

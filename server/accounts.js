@@ -40,6 +40,7 @@
               console.log("Error occured while creating new account.");
               return;
             }
+            connection._id = inserted._id;
             connection.session = account.session;
             clients.addClient(connection);
             clients.messageClient(connection, "loginSuccess", { session: account.session });
@@ -70,6 +71,7 @@
                 console.log("Error occured while logging in.");
                 return;
               }
+              connection._id = account._id;
               connection.session = session;
               clients.addClient(connection);
               clients.messageClient(connection, "loginSuccess", { session: session });
@@ -90,6 +92,7 @@
       } else if(!account) {
         clients.messageClient(connection, "sessionInvalid", {});
       } else {
+        connection._id = account._id;
         connection.session = account.session;
         clients.addClient(connection);
         clients.messageClient(connection, "loginSuccess", { session: account.session });
@@ -101,6 +104,7 @@
     clients.removeClient(connection);
     db.accounts.update({ session: connection.session }, { $unset: { session: 1 } });
     delete connection.session;
+    delete connection._id;
     clients.messageClient(connection, "logoutSuccess", {});
   };
 

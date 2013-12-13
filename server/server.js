@@ -50,11 +50,20 @@ wsServer.on("request", function(request) {
           case "saveLevel":
             levels.save(connection, data);
             break;
-          case "getLevels":
-            levels.get(connection, data);
+          case "getAllLevels":
+            levels.getAll(connection, data);
+            break;
+          case "getOwnLevels":
+            levels.getOwn(connection, data);
             break;
           case "playLevel":
             levels.play(connection, data);
+            break;
+          case "rateLevel":
+            levels.rate(connection, data);
+            break;
+          case "editLevel":
+            levels.edit(connection, data);
             break;
           default:
             console.log("Unexpected action.");

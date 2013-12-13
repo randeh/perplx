@@ -26,6 +26,4 @@ $(document).ready(function(event) {
     closeCurrentWindow = null;
   };
 
-  openLoading();
-
 });

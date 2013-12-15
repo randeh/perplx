@@ -212,8 +212,8 @@ $(document).ready(function(event) {
       var rated = row.data("rated");
       if(!rated) {
         var newRating = buildRating(data._id, row.data("completed"), data.rating, rated);
+        newRating.insertBefore(row.data("rating"));
         row.data("rating").remove();
-        // TODO insert newRating in the correct place in row
         row.data("rating", newRating);
       }
     }

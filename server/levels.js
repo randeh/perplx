@@ -33,7 +33,7 @@
     });
   };
 
-  var get = function(connection, data, filter) {
+  var get = function(connection, filter) {
     db.levels.find(filter, { level: 0 }, function(err, levels) {
       if(err) {
         console.log("Error occured while retrieving levels.");
@@ -60,12 +60,23 @@
     });
   };
 
-  module.exports.getAll = function(connection, data) {
-    get(connection, data, {});
+  module.exports.getAll = function(connection) {
+    get(connection, {});
   };
 
-  module.exports.getOwn = function(connection, data) {
-    get(connection, data, { creator: connection._id });
+  module.exports.getOwn = function(connection) {
+    get(connection, { creator: connection._id });
+  };
+
+  module.exports.create = function(connection) {
+    connection.area = "editor";
+    clients.messageClient(connection, "openEditor", {});
+  };
+
+  module.exports.discard = function(connection) {
+    connection.area = "lobby";
+    clients.messageClient(connection, "openLobby", {});
+    module.exports.getAll(connection);
   };
 
   module.exports.play = function(connection, data) {
@@ -77,24 +88,42 @@
       } else if(level.players > 1) {
         console.log("Attempting to play a multiplayer level alone.");
       } else {
+        connection.area = "play";
         clients.messageClient(connection, "openLevel", level.level);
       }
     });
   };
 
   module.exports.rate = function(connection, data) {
-    //
+    // TODO
+    // check data.rating is a valid rating, i.e. {1, 2, 3, 4, 5}
+    // find the level
+    // make sure we've completed the level
+    // search through the ratings
+    //  if we've already rated it, update that
+    //  otherwise, add a new rating
+    //  clients.messageAllInArea("lobby", "updateRating", { level._id, level.rating });
   };
 
   module.exports.edit = function(connection, data) {
     db.levels.findOne({ _id: ObjectId(data._id) }, { creator: 1, level: 1 }, function(err, level) {
       if(err) {
         console.log("Error occured while retrieving level data.");
-      } else if(!level.creator.equals(connection._id)) {
-        console.log("Attempting to edit somebody else's level.");
-      } else {
-        clients.messageClient(connection, "editLevel", level.level)
+        return;
       }
+      connection.area = "editor";
+      clients.messageClient(connection, "editLevel", level.level);
+    });
+  };
+
+  module.exports.remove = function(connection, data) {
+    // TODO deal with people who are waiting to play (or even playing) the level
+    db.levels.remove({ _id: ObjectId(data._id), creator: connection._id }, function(err, removed) {
+      if(err) {
+        console.log("Error deleting level.");
+        return;
+      }
+      clients.messageAllInArea("lobby", "removeLevel", { _id: data._id });
     });
   };
 

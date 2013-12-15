@@ -52,7 +52,7 @@ body.prelogin {
   height: 200px;
   margin-top: -120px;
 }
-#loading-spinner {
+#home-loading-spinner, #main-loading-spinner {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -99,7 +99,7 @@ body.prelogin {
   margin-right: 36px;
   float: right;
 }
-#home-container, .home-pane, #loading-spinner, .register-tip, #github-ribbon {
+#home-container, .home-pane, #home-loading-spinner, .register-tip, #github-ribbon {
   display: none;
 }
 #login-error, #register-error {
@@ -114,7 +114,7 @@ body.prelogin {
 }
 
 /* Main */
-#main-container, .main-pane, #editor-new-menu {
+#main-container, .main-pane, #main-loading-spinner, #editor-new-menu {
   display: none;
 }
 
@@ -123,7 +123,7 @@ body.prelogin {
   padding: 10px;
 }
 a.lobby-level-filter.selected {
-  cursor: default;
+  cursor: text;
   font-weight: bold;
   color: black;
 }

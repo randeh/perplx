@@ -8,11 +8,9 @@
 // simple user input e.g. mouse control
 // publishing/testing levels
 // rating
-// deleting/forking
+// build script (minify & combine files)
+//  use object["property"] instead of object.property so nothing breaks when the code is minified
 
-// use this["name"] instead of this.name so nothing breaks if the code is ever minified
-
-var openNewEditor;
 var selected;
 
 $(document).ready(function(event) {
@@ -40,7 +38,7 @@ $(document).ready(function(event) {
     closeCurrentWindow = null;
   };
 
-  openNewEditor = function() {
+  callbacks.openEditor = function(data) {
     openEditor();
     scene = new objects.Scene({ name: { value: "Game" } });
     $("#editor-tree-list").append(scene.listItem);
@@ -159,7 +157,7 @@ $(document).ready(function(event) {
   };
 
   $("#editor-exit-button").click(function(event) {
-    openLobby();
+    messageServer("exitEditor", {});
   });
 
 });

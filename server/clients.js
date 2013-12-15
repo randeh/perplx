@@ -9,7 +9,7 @@
   };
 
   module.exports.removeClient = function(connection) {
-    for(var i=0; i<clients.length; i++) {
+    for(var i = 0; i < clients.length; i++) {
       if(clients[i] === connection) {
         clients.splice(i, 1);
         break;
@@ -18,10 +18,9 @@
   };
 
   module.exports.logoutSession = function(session) {
-    for(var i=0; i<clients.length; i++) {
+    for(var i = 0; i < clients.length; i++) {
       if(clients[i].session === session) {
-        delete clients[i].session;
-        module.exports.messageClient(clients[i], "logoutSuccess", {});
+        accounts.logout(clients[i]);
         break;
       }
     }
@@ -42,8 +41,21 @@
       data: data
     };
     var messageString = JSON.stringify(message);
-    for(var i=0; i<clients.length; i++) {
+    for(var i = 0; i < clients.length; i++) {
       clients[i].sendUTF(messageString);
+    }
+  };
+
+  module.exports.messageAllInArea = function(area, action, data) {
+    var message = {
+      action: action,
+      data: data
+    };
+    var messageString = JSON.stringify(message);
+    for(var i = 0; i < clients.length; i++) {
+      if(clients[i].area === area) {
+        clients[i].sendUTF(messageString);
+      }
     }
   };
 
@@ -53,7 +65,7 @@
       data: data
     };
     var messageString = JSON.stringify(message);
-    for(var i=0; i<clients.length; i++) {
+    for(var i = 0; i < clients.length; i++) {
       if(clients[i] !== connection) {
         clients[i].sendUTF(messageString);
       }

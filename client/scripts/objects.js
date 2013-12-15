@@ -18,6 +18,7 @@ var fields = {
   y:                     { displayName: "Y Position",                                     defaultValue: 0,         type: "integer" }
 };
 
+// TODO write missing validator functions
 var fieldTypes = {
   name:    { htmlType: "text",   validator: validate.isValidObjectName  },
   string:  { htmlType: "text",   validator: function() { return true; } }, // unused so far

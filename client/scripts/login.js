@@ -36,7 +36,7 @@ $(document).ready(function(event) {
       "password": $("#login-password").val()
     };
     messageServer("login", data);
-    openLoading();
+    openHomeLoading();
   };
 
   $(".login-field").keypress(function(event) {
@@ -54,7 +54,7 @@ $(document).ready(function(event) {
 
   callbacks.loginSuccess = function(data) {
     localStorage.session = data["session"];
-    openLobby();
+    openMainLoading();
   };
 
   callbacks.loginFailure = function(data) {

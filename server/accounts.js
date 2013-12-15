@@ -5,11 +5,22 @@
   var crypto = require("crypto");
   var db = require("./database");
   var clients = require("./clients");
+  var levels = require("./levels");
   var validate = require("./../client/scripts/validate");
   var bcrypt = require("bcrypt");
 
   var generateSession = function() {
     return crypto.randomBytes(48).toString("hex");
+  };
+
+  var login = function(connection, session, id) {
+    connection._id = id;
+    connection.session = session;
+    connection.area = "lobby";
+    clients.addClient(connection);
+    clients.messageClient(connection, "loginSuccess", { session: session });
+    clients.messageClient(connection, "openLobby", {});
+    levels.getAll(connection);
   };
 
   module.exports.register = function(connection, data) {
@@ -40,10 +51,7 @@
               console.log("Error occured while creating new account.");
               return;
             }
-            connection._id = inserted._id;
-            connection.session = account.session;
-            clients.addClient(connection);
-            clients.messageClient(connection, "loginSuccess", { session: account.session });
+            login(connection, account.session, inserted._id);
           });
         }
       });
@@ -71,10 +79,7 @@
                 console.log("Error occured while logging in.");
                 return;
               }
-              connection._id = account._id;
-              connection.session = session;
-              clients.addClient(connection);
-              clients.messageClient(connection, "loginSuccess", { session: session });
+              login(connection, session, account._id);
             });
           } else {
             data.message = "Invalid password.";
@@ -92,19 +97,17 @@
       } else if(!account) {
         clients.messageClient(connection, "sessionInvalid", {});
       } else {
-        connection._id = account._id;
-        connection.session = account.session;
-        clients.addClient(connection);
-        clients.messageClient(connection, "loginSuccess", { session: account.session });
+        login(connection, account.session, account._id);
       }
     });
   };
 
-  module.exports.logout = function(connection, data) {
+  module.exports.logout = function(connection) {
     clients.removeClient(connection);
     db.accounts.update({ session: connection.session }, { $unset: { session: 1 } });
     delete connection.session;
     delete connection._id;
+    connection.area = "login";
     clients.messageClient(connection, "logoutSuccess", {});
   };
 

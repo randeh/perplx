@@ -50,7 +50,7 @@ $(document).ready(function(event) {
 
   callbacks.displayError = function(data) {
     throw(data["message"]);
-    openLoading();
+    openHomeLoading();
   };
 
 });

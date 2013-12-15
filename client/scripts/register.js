@@ -41,7 +41,7 @@ $(document).ready(function(event) {
       "password": $("#register-password").val()
     };
     messageServer("register", data);
-    openLoading();
+    openHomeLoading();
   };
 
   $("#register-button").click(register);

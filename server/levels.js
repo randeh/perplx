@@ -90,6 +90,9 @@
       } else {
         connection.area = "play";
         clients.messageClient(connection, "openLevel", level.level);
+        // TODO
+        // TEMP
+        // set this level as completed (for testing purposes)
       }
     });
   };
@@ -97,12 +100,37 @@
   module.exports.rate = function(connection, data) {
     // TODO
     // check data.rating is a valid rating, i.e. {1, 2, 3, 4, 5}
-    // find the level
-    // make sure we've completed the level
-    // search through the ratings
-    //  if we've already rated it, update that
-    //  otherwise, add a new rating
-    //  clients.messageAllInArea("lobby", "updateRating", { level._id, level.rating });
+    // find the level & completion in one step
+    // search through ratings (keep track of total and count)
+    //   if we've already rated it
+    //     update that: http://stackoverflow.com/questions/13777097/update-an-subdocument-contained-in-an-array-contained-in-a-mongodb-document
+    //   otherwise
+    //     add a new rating: http://docs.mongodb.org/manual/reference/operator/update/push/
+    //     count++
+    // total += rating
+    // clients.messageAllInArea("lobby", "updateRating", { level._id, total / count });
+    if(data.rating >= 1 && data.rating <= 5 && data.rating == Math.round(data.rating)) {
+      db.levels.findOne({ _id: ObjectId(data._id) }, { completions: 1, ratings: 1 }, function(err, level) {
+        if(err) {
+          console.log("Error occured while rating.");
+        } else if(!level) {
+          console.log("Attempting to rate level which does not exist.");
+        } else {
+          db.levels.findOne({ _id: ObjectId(data._id), "completions._id": connection._id }, function(err, completion) {
+            if(err) {
+              console.log("Error occured while rating.");
+            } else if(!completion) {
+              console.log("Attempting to rate level before completion.");
+            } else {
+              level.ratings.save({ _id: connection._id, rating: data.rating });
+              clients.messageAllInArea("lobby", "updateRating", { level: data._id, rating: data.rating });
+            }
+          });
+        }
+      });
+    } else {
+      console.log("Invalid rating.");
+    }
   };
 
   module.exports.edit = function(connection, data) {

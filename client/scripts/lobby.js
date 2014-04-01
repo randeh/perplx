@@ -109,7 +109,7 @@ $(document).ready(function(event) {
           for(var x = 0; x < 5; x++) {
             starImgs[x].prop("src", starImgs[x].data("starType"));
           }
-        }).click({ level: id, rating: s + 1 }, function(event) {
+        }).click({ _id: id, rating: s + 1 }, function(event) {
           messageServer("rateLevel", event.data);
           // Display only your rating from now on
           for(var s = 0; s < 5; s++) {

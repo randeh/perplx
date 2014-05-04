@@ -144,6 +144,7 @@ $(document).ready(function(event) {
         var tick = $(document.createElement("img")).prop("src", "images/tick.png");
         completed.append(tick);
       }
+      // Rating
       var rating = buildRating(level._id, level.completed, level.rating, level.rated);
       // Players
       // TODO use people icons

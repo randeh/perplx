@@ -41,17 +41,37 @@
       }
       for(var i = 0; i < levels.length; i++) {
         var level = levels[i];
-        // TODO set .rating, .rated & .completed based on .ratings & .completions
-        // TEMP:
-        level.completed = Math.random() < 0.5; // TEMP
-        level.rated = level.completed && Math.random() < 0.5; // TEMP
-        level.rating = (Math.random() * 4) + 1; // TEMP
-        if(level.rated) {
-          level.rating = Math.round(level.rating);
+        // Completed
+        level.completed = false;
+        for(var j = 0; j < level.completions.length; j++) {
+          if(level.completions[j]._id.equals(connection._id)) {
+            level.completed = true;
+            break;
+          }
         }
-
-        delete level.ratings;
         delete level.completions;
+        // Rated
+        level.rated = false;
+        var sum = 0;
+        var count = level.ratings.length;
+        for(var j = 0; j < count; j++) {
+          sum += level.ratings[j].rating;
+          if(level.ratings[j]._id.equals(connection._id)) {
+            level.rated = true;
+            level.rating = level.ratings[j].rating;
+            break;
+          }
+        }
+        delete level.ratings;
+        // Rating
+        if(!level.rated) {
+          if(count == 0) {
+            level.rating = 0;
+          } else {
+            level.rating = sum / count;
+          }
+        }
+        // Own
         if(level.creator.equals(connection._id)) {
           level.own = true;
         }
@@ -91,8 +111,7 @@
         connection.area = "play";
         clients.messageClient(connection, "openLevel", level.level);
         // TODO
-        // TEMP
-        // set this level as completed (for testing purposes)
+        // TEMP set this level as completed (for testing purposes)
       }
     });
   };
@@ -122,8 +141,17 @@
             } else if(!completion) {
               console.log("Attempting to rate level before completion.");
             } else {
-              level.ratings.save({ _id: connection._id, rating: data.rating });
-              clients.messageAllInArea("lobby", "updateRating", { level: data._id, rating: data.rating });
+              // TODO deal with same person rating level more than once
+              db.levels.update({ _id: ObjectId(data._id) }, { $addToSet: { ratings: { _id: connection._id, rating: data.rating } } }, function(err, updated) {
+                if(err) {
+                  console.log("Error occured while rating.");
+                } else if(!updated) {
+                  console.log("Rating not updated.");
+                } else {
+                  // TODO message all players with the new OVERALL rating rather than just this rating
+                  clients.messageAllInArea("lobby", "updateRating", { level: data._id, rating: data.rating });
+                }
+              });
             }
           });
         }

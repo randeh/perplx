@@ -47,11 +47,11 @@
           clients.messageClient(connection, "registerFailure", data);
         } else {
           db.accounts.insert(account, function(err, inserted) {
-            if(err || !inserted) {
+            if(err || !inserted || inserted.length == 0) {
               console.log("Error occured while creating new account.");
               return;
             }
-            login(connection, account.session, inserted._id);
+            login(connection, account.session, inserted[0]._id);
           });
         }
       });

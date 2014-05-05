@@ -2,29 +2,30 @@
 
 $(document).ready(function(event) {
 
-  var openPlay = function() {
+  callbacks.openLevel = function(data) {
     if(closeCurrentWindow !== null) {
       closeCurrentWindow();
     }
     $("#main-container").show();
-    $("#play-pane").show();
+    scene = buildLevel(JSON.parse(data));
+    $("#play-pane").show().append(scene.canvas);
+    scene.draw();
     mode = "play";
     closeCurrentWindow = closePlay;
   };
 
   var closePlay = function() {
     $("#main-container").hide();
-    $("#play-pane").empty().hide();
+    $("#play-pane canvas").remove();
+    $("#play-pane").hide();
     mode = "";
     scene = null;
     closeCurrentWindow = null;
   };
 
-  callbacks.openLevel = function(data) {
-    openPlay();
-    scene = buildLevel(JSON.parse(data));
-    $("#play-pane").append(scene.canvas);
-    scene.draw();
-  };
+  $("#play-exit-button").click(function(event) {
+    messageServer("exitPlay", {});
+    openMainLoading();
+  });
 
 });

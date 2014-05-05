@@ -3,6 +3,7 @@ var http = require("http");
 var accounts = require("./accounts");
 var clients = require("./clients");
 var levels = require("./levels");
+var play = require("./play");
 
 var httpServer = http.createServer(function(request, response) {
   console.log((new Date()) + " Received request for " + request.url);
@@ -48,7 +49,7 @@ var callbacks = {
       exitEditor: levels.discard
     },
     play: {
-      //
+      exitPlay: play.exit
     }
   }
 };

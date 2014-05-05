@@ -110,24 +110,20 @@
       } else {
         connection.area = "play";
         clients.messageClient(connection, "openLevel", level.level);
-        // TODO
-        // TEMP set this level as completed (for testing purposes)
+        // TODO need to do anything else here?
+
+        // TEMP set this level as completed now (for testing purposes)
+        db.levels.update({ _id: ObjectId(data._id) }, { $push: { completions: { _id: connection._id, time: Math.random() * 500 } } }, function(err, updated) {
+          if(err || !updated) {
+            console.log("Error occured while adding completion.");
+          }
+        });
       }
     });
   };
 
   module.exports.rate = function(connection, data) {
-    // TODO
-    // check data.rating is a valid rating, i.e. {1, 2, 3, 4, 5}
-    // find the level & completion in one step
-    // search through ratings (keep track of total and count)
-    //   if we've already rated it
-    //     update that: http://stackoverflow.com/questions/13777097/update-an-subdocument-contained-in-an-array-contained-in-a-mongodb-document
-    //   otherwise
-    //     add a new rating: http://docs.mongodb.org/manual/reference/operator/update/push/
-    //     count++
-    // total += rating
-    // clients.messageAllInArea("lobby", "updateRating", { level._id, total / count });
+    // TODO could possibly merge this mess of nested queries into one
     if(data.rating >= 1 && data.rating <= 5 && data.rating == Math.round(data.rating)) {
       db.levels.findOne({ _id: ObjectId(data._id) }, { completions: 1, ratings: 1 }, function(err, level) {
         if(err) {
@@ -135,21 +131,31 @@
         } else if(!level) {
           console.log("Attempting to rate level which does not exist.");
         } else {
-          db.levels.findOne({ _id: ObjectId(data._id), "completions._id": connection._id }, function(err, completion) {
+          db.levels.findOne({ _id: ObjectId(data._id), "completions._id": connection._id }, function(err, level) {
             if(err) {
               console.log("Error occured while rating.");
-            } else if(!completion) {
-              console.log("Attempting to rate level before completion.");
+            } else if(!level) {
+              console.log("Attempting to rate level before completing.");
             } else {
-              // TODO deal with same person rating level more than once
-              db.levels.update({ _id: ObjectId(data._id) }, { $addToSet: { ratings: { _id: connection._id, rating: data.rating } } }, function(err, updated) {
+              for(var i = 0; i < level.ratings.length; i++) {
+                if(level.ratings[i]._id.equals(connection._id)) {
+                  db.levels.update({ _id: ObjectId(data._id), "ratings._id": connection._id }, { $set: { "ratings.$.rating": data.rating } }, function(err, updated) {
+                    if(err || !updated) {
+                      console.log("Error occured while rating.");
+                    }
+                  });
+                  // TODO notify lobby about updated rating
+                  return;
+                }
+              }
+              db.levels.update({ _id: ObjectId(data._id) }, { $push: { ratings: { _id: connection._id, rating: data.rating } } }, function(err, updated) {
                 if(err) {
                   console.log("Error occured while rating.");
                 } else if(!updated) {
                   console.log("Rating not updated.");
                 } else {
-                  // TODO message all players with the new OVERALL rating rather than just this rating
-                  clients.messageAllInArea("lobby", "updateRating", { level: data._id, rating: data.rating });
+                  // TODO message all players with the new OVERALL rating rather than just this rating (new or existing rating)
+                  //clients.messageAllInArea("lobby", "updateRating", { level: data._id, rating: RATING });
                 }
               });
             }

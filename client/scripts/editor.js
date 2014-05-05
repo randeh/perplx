@@ -1,15 +1,23 @@
 "use strict";
 
-// Tasks
+// Tasks:
+
 // allow formulae as input (except for names)
 // dynamic fields & triggers
 // more shapes and fields
 // player, keyboard & mouse objects
 // simple user input e.g. mouse control
 // publishing/testing levels
-// rating
-// build script (minify & combine files)
-//  use object["property"] instead of object.property so nothing breaks when the code is minified
+// don't allow duplicate object names
+// avoid using .css(), use classes instead
+
+// build script
+// > minify scripts
+// > combine files
+// > use object["property"] instead of object.property so nothing breaks when the code is minified
+// http server for client
+// > possibly use python's SimpleHTTPServer
+// > remove "http:" protocol specifier from jQuery source
 
 var selected;
 
@@ -158,6 +166,7 @@ $(document).ready(function(event) {
 
   $("#editor-exit-button").click(function(event) {
     messageServer("exitEditor", {});
+    openMainLoading();
   });
 
 });

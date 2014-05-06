@@ -2,31 +2,34 @@
 
 var objects = {};
 
-var objectTypes = [ "Box", "Group" ];
+var objectTypes = [ "Box", "Group", "Mouse" ];
 
 var fields = {
-  name:                  { displayName: "Name",             method: "setName",                                     type: "name"    },
-  canvasWidth:           { displayName: "Width",            method: "setWidth",           defaultValue: 700,       type: "integer" },
-  canvasHeight:          { displayName: "Height",           method: "setHeight",          defaultValue: 500,       type: "integer" },
-  canvasBackgroundColor: { displayName: "Background Color", method: "setBackgroundColor", defaultValue: "#eeeeee", type: "color"   },
-  canvasLineColor:       { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"   }, // unused so far
-  shapeWidth:            { displayName: "Width",                                          defaultValue: 100,       type: "integer" },
-  shapeHeight:           { displayName: "Height",                                         defaultValue: 100,       type: "integer" },
-  shapeBackgroundColor:  { displayName: "Background Color",                               defaultValue: "#ff9933", type: "color"   },
-  shapeLineColor:        { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"   }, // unused so far
-  x:                     { displayName: "X Position",                                     defaultValue: 0,         type: "integer" },
-  y:                     { displayName: "Y Position",                                     defaultValue: 0,         type: "integer" }
+  name:                  { displayName: "Name",             method: "setName",                                     type: "name"                   },
+  canvasWidth:           { displayName: "Width",            method: "setWidth",           defaultValue: 700,       type: "integer"                },
+  canvasHeight:          { displayName: "Height",           method: "setHeight",          defaultValue: 500,       type: "integer"                },
+  canvasBackgroundColor: { displayName: "Background Color", method: "setBackgroundColor", defaultValue: "#eeeeee", type: "color"                  },
+  canvasLineColor:       { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
+  shapeWidth:            { displayName: "Width",                                          defaultValue: 100,       type: "integer"                },
+  shapeHeight:           { displayName: "Height",                                         defaultValue: 100,       type: "integer"                },
+  shapeBackgroundColor:  { displayName: "Background Color",                               defaultValue: "#ff9933", type: "color"                  },
+  shapeLineColor:        { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
+  x:                     { displayName: "X Position",                                     defaultValue: 0,         type: "integer"                },
+  y:                     { displayName: "Y Position",                                     defaultValue: 0,         type: "integer"                },
+  mouseX:                { displayName: "X Position",                                                              type: "integer", dynamic: true },
+  mouseY:                { displayName: "Y Position",                                                              type: "integer", dynamic: true }
 };
 
-// TODO write missing validator functions
 var fieldTypes = {
-  name:    { htmlType: "text",   validator: validate.isValidObjectName  },
-  string:  { htmlType: "text",   validator: function() { return true; } }, // unused so far
-  integer: { htmlType: "number", validator: function() { return true; } },
-  color:   { htmlType: "color",  validator: function() { return true; } }
+  name:    { htmlType: "text",  validator: validate.isValidObjectName                     },
+  string:  { htmlType: "text",  validator: validate.isValidString,                        },
+  integer: { htmlType: "text",  validator: validate.isValidInteger,   allowFormulae: true },
+  color:   { htmlType: "color", validator: validate.isValidColor,                         }
 };
 
 var buildLevel;
+
+// structure to deal with used/unused object names, and which fields reference their properties
 
 $(document).ready(function(event) {
 
@@ -103,32 +106,38 @@ $(document).ready(function(event) {
       var fieldProperties = fields[field];
       var id = "inspector-field-" + field;
       var label = $(document.createElement("label")).prop("for", id).text(fieldProperties.displayName + ":");
-      var input = $(document.createElement("input")).prop({ "id": id, "type": fieldTypes[fieldProperties.type].htmlType });
-      input.val(this.properties[field].value).data("lastValue", this.properties[field].value);
-      input.on("input", { obj: this, field: field, fieldProperties: fieldProperties, input: input }, function(event) {
-        var obj = event.data.obj;
-        var field = event.data.field;
-        var fieldProperties = event.data.fieldProperties;
-        var input = event.data.input;
-        var val = input.val();
-        if(fieldTypes[fieldProperties.type].validator(val)) {
-          input.data("lastValue", val);
-        }
-        obj.properties[field].value = val;
-        if("method" in fieldProperties) {
-          obj[fieldProperties.method](val);
-        }
-        if(field != "name") {
-          scene.draw();
-        }
-      }).blur({ fieldProperties: fieldProperties, input: input }, function(event) {
-        var fieldProperties = event.data.fieldProperties;
-        var input = event.data.input;
-        if(!fieldTypes[fieldProperties.type].validator(input.val())) {
-          input.val(input.data("lastValue")).trigger("input");
-        }
-      });
-      var container = $(document.createElement("div")).append(label).append(input);
+      var container = $(document.createElement("div")).append(label);
+      if("dynamic" in fieldProperties) {
+        var dynamic = $(document.createElement("span")).text(field);
+        container.append(dynamic);
+      } else {
+        var input = $(document.createElement("input")).prop({ "id": id, "type": fieldTypes[fieldProperties.type].htmlType });
+        input.val(this.properties[field].value).data("lastValue", this.properties[field].value);
+        input.on("input", { obj: this, field: field, fieldProperties: fieldProperties, input: input }, function(event) {
+          var obj = event.data.obj;
+          var field = event.data.field;
+          var fieldProperties = event.data.fieldProperties;
+          var input = event.data.input;
+          var val = input.val();
+          if(fieldTypes[fieldProperties.type].validator(val)) {
+            input.data("lastValue", val);
+          }
+          obj.properties[field].value = val;
+          if("method" in fieldProperties) {
+            obj[fieldProperties.method](val);
+          }
+          if(field != "name") {
+            scene.draw();
+          }
+        }).blur({ fieldProperties: fieldProperties, input: input }, function(event) {
+          var fieldProperties = event.data.fieldProperties;
+          var input = event.data.input;
+          if(!fieldTypes[fieldProperties.type].validator(input.val())) {
+            input.val(input.data("lastValue")).trigger("input");
+          }
+        });
+        container.append(input);
+      }
       $("#editor-properties").append(container);
     }
   };
@@ -213,6 +222,16 @@ $(document).ready(function(event) {
     context.fillStyle = this.properties.shapeBackgroundColor.value;
     context.fillRect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
   };
+
+  objects.Mouse = function(properties) {
+    objects.Object.apply(this, [properties]);
+    this.applyUpdateMethods();
+  };
+  objects.Mouse.prototype = new objects.Object();
+  objects.Mouse.prototype.constructor = objects.Mouse;
+  objects.Mouse.prototype.type = "Mouse";
+  objects.Mouse.prototype.fields = [ "name", "mouseX", "mouseY" ];
+  objects.Mouse.prototype.draw = function(context) {};
 
   buildLevel = function(data) {
     var object = new objects[data.type](data.properties);

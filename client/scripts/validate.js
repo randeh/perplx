@@ -20,7 +20,27 @@
   };
 
   exports.isValidObjectName = function(name) {
+    // TODO check name availability
     return objectNameRegex.test(name);
   };
+
+  exports.isValidString = function(string) {
+    // TEMP
+    return true;
+  }
+
+  exports.isValidInteger = function(integer) {
+    return integer == parseInt(integer);
+  }
+
+  exports.isValidColor = function(color) {
+    // TEMP
+    return true;
+  }
+
+  exports.isValidFormula = function(formula) {
+    // TEMP
+    return formula == "mouseX" || formula == "mouseY";
+  }
 
 }(typeof exports === "undefined" ? this.validate = {} : exports));

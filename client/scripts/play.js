@@ -11,12 +11,17 @@ $(document).ready(function(event) {
     $("#play-pane").show().append(scene.canvas);
     scene.draw();
     mode = "play";
+    scene.canvas.mousemove(function(event) {
+      // go through and find any fields which rely on this
+      // event.pageX, event.pageY
+      
+    });
     closeCurrentWindow = closePlay;
   };
 
   var closePlay = function() {
     $("#main-container").hide();
-    $("#play-pane canvas").remove();
+    scene.canvas.remove();
     $("#play-pane").hide();
     mode = "";
     scene = null;

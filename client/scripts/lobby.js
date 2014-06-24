@@ -199,7 +199,9 @@ $(document).ready(function(event) {
     $(this).val("Join").click(event.data, joinLevel);
   };
 
-  // TODO What if a callback is recieved while the loading page is being displayed and levels is null
+  // TODO
+  // Potential race condition
+  // What if a callback is recieved while the loading page is being displayed and levels is null
   callbacks.removeLevel = function(data) {
     if(data._id in levels) {
       levels[data._id].remove();

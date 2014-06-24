@@ -29,8 +29,6 @@ var fieldTypes = {
 
 var buildLevel;
 
-// structure to deal with used/unused object names, and which fields reference their properties
-
 $(document).ready(function(event) {
 
   objects.Object = function(properties) {

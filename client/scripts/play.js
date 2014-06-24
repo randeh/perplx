@@ -11,6 +11,7 @@ $(document).ready(function(event) {
     $("#play-pane").show().append(scene.canvas);
     scene.draw();
     mode = "play";
+    // TEMP
     scene.canvas.mousemove(function(event) {
       // go through and find any fields which rely on this
       // event.pageX, event.pageY

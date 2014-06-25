@@ -29,7 +29,7 @@ $(document).ready(function(event) {
 
   callbacks.openEditor = function(data) {
     openEditor();
-    scene = new objects.Scene({ name: { value: "Game" } });
+    scene = new objects.Scene({ name: { value: "" } });
     $("#editor-tree-list").append(scene.listItem);
     $("#editor-canvas-holder").append(scene.canvas);
   };
@@ -80,7 +80,7 @@ $(document).ready(function(event) {
     var parent;
     if(selected == null) {
       parent = scene;
-    } else if(selected.isContainer) {
+    } else if(selected.isContainer && selected.type != "Player") {
       parent = selected;
     } else {
       parent = selected.parent;
@@ -101,7 +101,7 @@ $(document).ready(function(event) {
   });
 
   $("#editor-delete-button").click(function(event) {
-    if(selected != null && selected.type != objects.Scene.prototype.type) {
+    if(selected != null && selected.type != "Scene" && selected.type != "Keyboard" && selected.type != "Mouse") {
       var object = selected;
       object.deselect();
       object.parent.children = jQuery.grep(object.parent.children, function(arrayItem) {

@@ -21,7 +21,7 @@
 
   exports.isValidObjectName = function(name) {
     // TODO check name availability
-    return objectNameRegex.test(name);
+    return name == "" || objectNameRegex.test(name);
   };
 
   exports.isValidString = function(string) {
@@ -38,9 +38,14 @@
     return true;
   }
 
+  exports.isValidBoolean = function(boolean) {
+    // TEMP
+    return true;
+  }
+
   exports.isValidFormula = function(formula) {
     // TEMP
-    return formula == "mouseX" || formula == "mouseY";
+    return true;
   }
 
 }(typeof exports === "undefined" ? this.validate = {} : exports));

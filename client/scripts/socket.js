@@ -49,6 +49,7 @@ $(document).ready(function(event) {
   }
 
   callbacks.displayError = function(data) {
+    // TODO Record crashes?
     throw(data["message"]);
     openHomeLoading();
   };

@@ -2,29 +2,39 @@
 
 var objects = {};
 
-var objectTypes = [ "Box", "Group", "Mouse" ];
+var objectTypes = [ "Box", "Group", "Player" ];
 
 var fields = {
-  name:                  { displayName: "Name",             method: "setName",                                     type: "name"                   },
-  canvasWidth:           { displayName: "Width",            method: "setWidth",           defaultValue: 700,       type: "integer"                },
-  canvasHeight:          { displayName: "Height",           method: "setHeight",          defaultValue: 500,       type: "integer"                },
-  canvasBackgroundColor: { displayName: "Background Color", method: "setBackgroundColor", defaultValue: "#eeeeee", type: "color"                  },
-  canvasLineColor:       { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
-  shapeWidth:            { displayName: "Width",                                          defaultValue: 100,       type: "integer"                },
-  shapeHeight:           { displayName: "Height",                                         defaultValue: 100,       type: "integer"                },
-  shapeBackgroundColor:  { displayName: "Background Color",                               defaultValue: "#ff9933", type: "color"                  },
-  shapeLineColor:        { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
-  x:                     { displayName: "X Position",                                     defaultValue: 0,         type: "integer"                },
-  y:                     { displayName: "Y Position",                                     defaultValue: 0,         type: "integer"                },
-  mouseX:                { displayName: "X Position",                                                              type: "integer", dynamic: true },
-  mouseY:                { displayName: "Y Position",                                                              type: "integer", dynamic: true }
+  "name":                  { displayName: "Name",             method: "setName",                                     type: "name"                   },
+  "canvasWidth":           { displayName: "Width",            method: "setWidth",           defaultValue: 700,       type: "integer"                },
+  "canvasHeight":          { displayName: "Height",           method: "setHeight",          defaultValue: 500,       type: "integer"                },
+  "canvasBackgroundColor": { displayName: "Background Color", method: "setBackgroundColor", defaultValue: "#eeeeee", type: "color"                  },
+  "canvasLineColor":       { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
+  "shapeWidth":            { displayName: "Width",                                          defaultValue: 100,       type: "integer"                },
+  "shapeHeight":           { displayName: "Height",                                         defaultValue: 100,       type: "integer"                },
+  "shapeBackgroundColor":  { displayName: "Background Color",                               defaultValue: "#ff9933", type: "color"                  },
+  "shapeLineColor":        { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
+  "x":                     { displayName: "X Position",                                     defaultValue: 0,         type: "integer"                },
+  "y":                     { displayName: "Y Position",                                     defaultValue: 0,         type: "integer"                },
+  "mouseX":                { displayName: "X Position",                                                              type: "integer", dynamic: true },
+  "mouseY":                { displayName: "Y Position",                                                              type: "integer", dynamic: true },
+  "mouseClick":            { displayName: "Click",                                                                   type: "boolean", dynamic: true },
+  "keyArrowUp":            { displayName: "Arrow Up",                                                                type: "boolean", dynamic: true },
+  "keyArrowDown":          { displayName: "Arrow Down",                                                              type: "boolean", dynamic: true },
+  "keyArrowLeft":          { displayName: "Arrow Left",                                                              type: "boolean", dynamic: true },
+  "keyArrowRight":         { displayName: "Arrow Right",                                                             type: "boolean", dynamic: true },
+  "keySpace":              { displayName: "Space",                                                                   type: "boolean", dynamic: true }
 };
 
+// Eventually all fields will allow formulae (of different types)
+// Each type should have a separate formulaValidator?
+// (or use a general one and specify which type it must unify with?)
 var fieldTypes = {
-  name:    { htmlType: "text",  validator: validate.isValidObjectName                     },
-  string:  { htmlType: "text",  validator: validate.isValidString,                        },
-  integer: { htmlType: "text",  validator: validate.isValidInteger,   allowFormulae: true },
-  color:   { htmlType: "color", validator: validate.isValidColor,                         }
+  "name":    { htmlType: "text",     validator: validate.isValidObjectName                     },
+  "string":  { htmlType: "text",     validator: validate.isValidString,                        },
+  "integer": { htmlType: "text",     validator: validate.isValidInteger,   allowFormulae: true },
+  "color":   { htmlType: "color",    validator: validate.isValidColor,                         },
+  "boolean": { htmlType: "checkbox", validator: validate.isValidBoolean,                       }
 };
 
 var buildLevel;
@@ -40,8 +50,10 @@ $(document).ready(function(event) {
       var field = this.fields[i];
       if(field in properties) {
         this.properties[field] = properties[field];
-      } else {
+      } else if("defaultValue" in fields[field]) {
         this.properties[field] = { value: fields[field].defaultValue };
+      } else if(!("dynamic" in fields[field])) {
+        callbacks.displayError({ message: "Required field '" + field + "' not supplied in " + this.type + " constructor" });
       }
     }
     if(mode == "editor") {
@@ -70,7 +82,11 @@ $(document).ready(function(event) {
   };
   objects.Object.prototype.setName = function(name) {
     if(mode == "editor") {
-      this.label.text(name + " : " + this.type);
+      if(name != "") {
+        this.label.text(name + " : " + this.type);
+      } else {
+        this.label.text("<object> : " + this.type);
+      }
     }
   };
   objects.Object.prototype.addChild = function(child) {
@@ -221,6 +237,22 @@ $(document).ready(function(event) {
     context.fillRect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
   };
 
+  objects.Player = function(properties) {
+    objects.Object.apply(this, [properties]);
+    this.applyUpdateMethods();
+    this.keyboard = new objects.Keyboard({ name: { value: "" } });
+    this.mouse = new objects.Mouse({ name: { value: "" } });
+    this.addChild(this.keyboard);
+    this.addChild(this.mouse);
+    this.expand();
+  };
+  objects.Player.prototype = new objects.Object();
+  objects.Player.prototype.constructor = objects.Player;
+  objects.Player.prototype.type = "Player";
+  objects.Player.prototype.fields = [ "name" ];
+  objects.Player.prototype.isContainer = true;
+  objects.Player.prototype.draw = function(context) {};
+
   objects.Mouse = function(properties) {
     objects.Object.apply(this, [properties]);
     this.applyUpdateMethods();
@@ -228,8 +260,18 @@ $(document).ready(function(event) {
   objects.Mouse.prototype = new objects.Object();
   objects.Mouse.prototype.constructor = objects.Mouse;
   objects.Mouse.prototype.type = "Mouse";
-  objects.Mouse.prototype.fields = [ "name", "mouseX", "mouseY" ];
+  objects.Mouse.prototype.fields = [ "name", "mouseX", "mouseY", "mouseClick" ];
   objects.Mouse.prototype.draw = function(context) {};
+
+  objects.Keyboard = function(properties) {
+    objects.Object.apply(this, [properties]);
+    this.applyUpdateMethods();
+  };
+  objects.Keyboard.prototype = new objects.Object();
+  objects.Keyboard.prototype.constructor = objects.Keyboard;
+  objects.Keyboard.prototype.type = "Keyboard";
+  objects.Keyboard.prototype.fields = [ "name", "keyArrowUp", "keyArrowDown", "keyArrowLeft", "keyArrowRight", "keySpace" ];
+  objects.Keyboard.prototype.draw = function(context) {};
 
   buildLevel = function(data) {
     var object = new objects[data.type](data.properties);

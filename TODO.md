@@ -1,6 +1,6 @@
 # Next Tasks
-- [ ] Add player/mouse/keyboard objects
-- [ ] Allow formulae as input (except for names)
+- [x] Add player/mouse/keyboard objects
+- [ ] Allow formulae as input (except for name & any dynamic fields)
 - [ ] Simple user input e.g. mouse control
 - [ ] Dynamic fields & triggers
 - [ ] More shapes and fields

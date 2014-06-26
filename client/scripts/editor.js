@@ -1,6 +1,7 @@
 "use strict";
 
 var selected;
+var usedNames;
 
 $(document).ready(function(event) {
 
@@ -12,6 +13,7 @@ $(document).ready(function(event) {
     $("#editor-pane").show();
     mode = "editor";
     selected = null;
+    usedNames = {};
     closeCurrentWindow = closeEditor;
   };
 
@@ -24,12 +26,13 @@ $(document).ready(function(event) {
     mode = "";
     scene = null;
     selected = null;
+    usedNames = {};
     closeCurrentWindow = null;
   };
 
   callbacks.openEditor = function(data) {
     openEditor();
-    scene = new objects.Scene({ name: { value: "" } });
+    scene = new objects.Scene();
     $("#editor-tree-list").append(scene.listItem);
     $("#editor-canvas-holder").append(scene.canvas);
   };
@@ -94,6 +97,7 @@ $(document).ready(function(event) {
   $("#editor-new-button").click(openNewMenu);
   $("#editor-new-cancel").click(closeNewMenu);
   $("#editor-new-ok").click(newObject);
+  // TODO does this keypress get fired even if the 'new' menu is hidden?
   $(".editor-new-field").keypress(function(event) {
     if(event.which == 13) {
       newObject();

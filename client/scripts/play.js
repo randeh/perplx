@@ -7,16 +7,11 @@ $(document).ready(function(event) {
       closeCurrentWindow();
     }
     $("#main-container").show();
+    usedNames = {};
     scene = buildLevel(JSON.parse(data));
     $("#play-pane").show().append(scene.canvas);
     scene.draw();
     mode = "play";
-    // TEMP
-    scene.canvas.mousemove(function(event) {
-      // go through and find any fields which rely on this
-      // event.pageX, event.pageY
-      
-    });
     closeCurrentWindow = closePlay;
   };
 
@@ -26,6 +21,7 @@ $(document).ready(function(event) {
     $("#play-pane").hide();
     mode = "";
     scene = null;
+    usedNames = {};
     closeCurrentWindow = null;
   };
 

@@ -5,7 +5,7 @@ var objects = {};
 var objectTypes = [ "Box", "Group", "Player" ];
 
 var fields = {
-  "name":                  { displayName: "Name",             method: "setName",                                     type: "name"                   },
+  "name":                  { displayName: "Name",             method: "setName",            defaultValue: ""         type: "name"                   },
   "canvasWidth":           { displayName: "Width",            method: "setWidth",           defaultValue: 700,       type: "integer"                },
   "canvasHeight":          { displayName: "Height",           method: "setHeight",          defaultValue: 500,       type: "integer"                },
   "canvasBackgroundColor": { displayName: "Background Color", method: "setBackgroundColor", defaultValue: "#eeeeee", type: "color"                  },
@@ -26,15 +26,12 @@ var fields = {
   "keySpace":              { displayName: "Space",                                                                   type: "boolean", dynamic: true }
 };
 
-// Eventually all fields will allow formulae (of different types)
-// Each type should have a separate formulaValidator?
-// (or use a general one and specify which type it must unify with?)
 var fieldTypes = {
-  "name":    { htmlType: "text",     validator: validate.isValidObjectName                     },
-  "string":  { htmlType: "text",     validator: validate.isValidString,                        },
-  "integer": { htmlType: "text",     validator: validate.isValidInteger,   allowFormulae: true },
-  "color":   { htmlType: "color",    validator: validate.isValidColor,                         },
-  "boolean": { htmlType: "checkbox", validator: validate.isValidBoolean,                       }
+  "name":    { htmlType: "text",     validator: validate.isValidObjectName                                                  },
+  "string":  { htmlType: "text",     validator: validate.isValidString,    formulaValidator: validate.isValidStringFormula  },
+  "integer": { htmlType: "number",   validator: validate.isValidInteger,   formulaValidator: validate.isValidIntegerFormula },
+  "color":   { htmlType: "color",    validator: validate.isValidColor,     formulaValidator: validate.isValidColorFormula   },
+  "boolean": { htmlType: "checkbox", validator: validate.isValidBoolean,   formulaValidator: validate.isValidBooleanFormula }
 };
 
 var buildLevel;
@@ -49,6 +46,8 @@ $(document).ready(function(event) {
     for(var i = 0; i < this.fields.length; i++) {
       var field = this.fields[i];
       if(field in properties) {
+        // TODO need to validate this?
+        // (only for sanity, any validation failure would be a bug)
         this.properties[field] = properties[field];
       } else if("defaultValue" in fields[field]) {
         this.properties[field] = { value: fields[field].defaultValue };
@@ -80,12 +79,18 @@ $(document).ready(function(event) {
       }
     }
   };
-  objects.Object.prototype.setName = function(name) {
+  objects.Object.prototype.setName = function(name, previousName) {
     if(mode == "editor") {
       if(name != "") {
         this.label.text(name + " : " + this.type);
       } else {
         this.label.text("<object> : " + this.type);
+      }
+      if(previousName !== undefined && previousName != "") {
+        delete usedNames[previousName];
+      }
+      if(name != "") {
+        usedNames[name] = true;
       }
     }
   };
@@ -133,15 +138,16 @@ $(document).ready(function(event) {
           var fieldProperties = event.data.fieldProperties;
           var input = event.data.input;
           var val = input.val();
+          var lastValue = input.data("lastValue");
           if(fieldTypes[fieldProperties.type].validator(val)) {
             input.data("lastValue", val);
-          }
-          obj.properties[field].value = val;
-          if("method" in fieldProperties) {
-            obj[fieldProperties.method](val);
-          }
-          if(field != "name") {
-            scene.draw();
+            obj.properties[field].value = val;
+            if("method" in fieldProperties) {
+              obj[fieldProperties.method](val, lastValue);
+            }
+            if(field != "name") {
+              scene.draw();
+            }
           }
         }).blur({ fieldProperties: fieldProperties, input: input }, function(event) {
           var fieldProperties = event.data.fieldProperties;
@@ -240,8 +246,8 @@ $(document).ready(function(event) {
   objects.Player = function(properties) {
     objects.Object.apply(this, [properties]);
     this.applyUpdateMethods();
-    this.keyboard = new objects.Keyboard({ name: { value: "" } });
-    this.mouse = new objects.Mouse({ name: { value: "" } });
+    this.keyboard = new objects.Keyboard();
+    this.mouse = new objects.Mouse();
     this.addChild(this.keyboard);
     this.addChild(this.mouse);
     this.expand();

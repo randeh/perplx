@@ -20,32 +20,46 @@
   };
 
   exports.isValidObjectName = function(name) {
-    // TODO check name availability
-    return name == "" || objectNameRegex.test(name);
+    return name == "" || (objectNameRegex.test(name) && !(name in usedNames));
   };
 
   exports.isValidString = function(string) {
     // TEMP
     return true;
-  }
+  };
 
   exports.isValidInteger = function(integer) {
     return integer == parseInt(integer);
-  }
+  };
 
   exports.isValidColor = function(color) {
     // TEMP
     return true;
-  }
+  };
 
   exports.isValidBoolean = function(boolean) {
     // TEMP
     return true;
-  }
+  };
 
-  exports.isValidFormula = function(formula) {
+  exports.isValidStringFormula = function(formula) {
     // TEMP
     return true;
-  }
+  };
+
+  exports.isValidIntegerFormula = function(formula) {
+    // TEMP
+    return true;
+  };
+
+  exports.isValidColorFormula = function(formula) {
+    // TEMP
+    return true;
+  };
+
+  exports.isValidBooleanFormula = function(formula) {
+    // TEMP
+    return true;
+  };
 
 }(typeof exports === "undefined" ? this.validate = {} : exports));

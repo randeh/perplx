@@ -1,8 +1,12 @@
 # Next Tasks
 - [x] Add player/mouse/keyboard objects
-- [ ] Allow formulae as input (except for name & any dynamic fields)
+- [ ] Allow formulae as input
+  - Only if field type allows formulae (has a formulaValidator) and field is not dynamic
 - [ ] Simple user input e.g. mouse control
-- [ ] Dynamic fields & triggers
+  - Start with single player, client-sided only
+  - Move the logic to server-side eventually
+- [ ] Custom fields
+- [ ] Triggers
 - [ ] More shapes and fields
 - [ ] Publishing/testing levels
 - [ ] Preload all images

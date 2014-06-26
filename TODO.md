@@ -15,6 +15,10 @@
 - [ ] Tighten up validation and error reporting
   - [ ] Don't allow duplicate object names
     - Keep track of used object names and which fields reference the object
+  - Display nice messages in editor
+    - [ ] Invalid object name (when creating new object)
+    - [ ] Level saved
+    - [ ] Level not saved
   - [ ] Validation of uploaded levels on server-side
   - etc.
 - [ ] Avoid using $.css() wherever possible

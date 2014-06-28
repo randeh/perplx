@@ -46,13 +46,24 @@ $(document).ready(function(event) {
     for(var i = 0; i < this.fields.length; i++) {
       var field = this.fields[i];
       if(field in properties) {
-        // TODO need to validate this?
-        // (only for sanity, any validation failure would be a bug)
         this.properties[field] = properties[field];
       } else if("defaultValue" in fields[field]) {
         this.properties[field] = { value: fields[field].defaultValue };
       } else if(!("dynamic" in fields[field])) {
         callbacks.displayError({ message: "Required field '" + field + "' not supplied in " + this.type + " constructor" });
+      } else {
+        continue;
+      }
+      var type = fieldTypes[fields[field].type];
+      if("value" in properties[field])) {
+        if(!type.validator(properties[field].value) {
+          callbacks.displayError({ message: "Invalid value supplied for field '" + field + "' of type '" + fields[field].type + "': " + properties[field].value });
+        }
+      } else {
+        callbacks.displayError({ message: "No value supplied for field '" + field + "'" });
+      }
+      if("formula" in properties[field] && !type.formulaValidator(properties[field].formula)) {
+        callbacks.displayError({ message: "Invalid formula supplied for field '" + field + "' of type '" + fields[field].type + "': " + properties[field].formula });
       }
     }
     if(mode == "editor") {

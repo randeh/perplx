@@ -5,15 +5,15 @@ var objects = {};
 var objectTypes = [ "Box", "Group", "Player" ];
 
 var fields = {
-  "name":                  { displayName: "Name",             method: "setName",            defaultValue: ""         type: "name"                   },
+  "name":                  { displayName: "Name",             method: "setName",            defaultValue: "",        type: "name"                   },
   "canvasWidth":           { displayName: "Width",            method: "setWidth",           defaultValue: 700,       type: "integer"                },
   "canvasHeight":          { displayName: "Height",           method: "setHeight",          defaultValue: 500,       type: "integer"                },
   "canvasBackgroundColor": { displayName: "Background Color", method: "setBackgroundColor", defaultValue: "#eeeeee", type: "color"                  },
-  "canvasLineColor":       { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
+  "canvasBorderColor":     { displayName: "Border Color",     method: "setBorderColor",     defaultValue: "#000000", type: "color"                  },
   "shapeWidth":            { displayName: "Width",                                          defaultValue: 100,       type: "integer"                },
   "shapeHeight":           { displayName: "Height",                                         defaultValue: 100,       type: "integer"                },
   "shapeBackgroundColor":  { displayName: "Background Color",                               defaultValue: "#ff9933", type: "color"                  },
-  "shapeLineColor":        { displayName: "Line Color",                                     defaultValue: "#000000", type: "color"                  }, // unused so far
+  "shapeLineColor":        { displayName: "Line Color",                                     defaultValue: "#ffffff", type: "color"                  },
   "x":                     { displayName: "X Position",                                     defaultValue: 0,         type: "integer"                },
   "y":                     { displayName: "Y Position",                                     defaultValue: 0,         type: "integer"                },
   "mouseX":                { displayName: "X Position",                                                              type: "integer", dynamic: true },
@@ -195,7 +195,7 @@ $(document).ready(function(event) {
   objects.Scene.prototype = new objects.Object();
   objects.Scene.prototype.constructor = objects.Scene;
   objects.Scene.prototype.type = "Scene";
-  objects.Scene.prototype.fields = [ "name", "canvasWidth", "canvasHeight", "canvasBackgroundColor" ];
+  objects.Scene.prototype.fields = [ "name", "canvasWidth", "canvasHeight", "canvasBackgroundColor", "canvasBorderColor" ];
   objects.Scene.prototype.isContainer = true;
   objects.Scene.prototype.draw = function() {
     this.context.clearRect(0, 0, this.properties.canvasWidth.value, this.properties.canvasHeight.value);
@@ -213,6 +213,9 @@ $(document).ready(function(event) {
   };
   objects.Scene.prototype.setBackgroundColor = function(backgroundColor) {
     this.canvas.css({ "background-color": backgroundColor });
+  };
+  objects.Scene.prototype.setBorderColor = function(borderColor) {
+    this.canvas.css({ "border-style": "solid", "border-width": "1px", "border-color": borderColor });
   };
 
   objects.Group = function(properties) {
@@ -237,10 +240,14 @@ $(document).ready(function(event) {
   objects.Box.prototype = new objects.Object();
   objects.Box.prototype.constructor = objects.Box;
   objects.Box.prototype.type = "Box";
-  objects.Box.prototype.fields = [ "name", "shapeWidth", "shapeHeight", "shapeBackgroundColor", "x", "y" ];
+  objects.Box.prototype.fields = [ "name", "shapeWidth", "shapeHeight", "shapeBackgroundColor", "shapeLineColor", "x", "y" ];
   objects.Box.prototype.draw = function(context) {
+    context.rect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
     context.fillStyle = this.properties.shapeBackgroundColor.value;
-    context.fillRect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
+    context.fill();
+    context.strokeStyle = this.properties.shapeLineColor.value;
+    context.lineWidth = 1;
+    context.stroke();
   };
 
   objects.Player = function(properties) {

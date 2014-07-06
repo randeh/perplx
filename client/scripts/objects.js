@@ -55,15 +55,15 @@ $(document).ready(function(event) {
         continue;
       }
       var type = fieldTypes[fields[field].type];
-      if("value" in properties[field])) {
-        if(!type.validator(properties[field].value) {
-          callbacks.displayError({ message: "Invalid value supplied for field '" + field + "' of type '" + fields[field].type + "': " + properties[field].value });
+      if("value" in this.properties[field]) {
+        if(!type.validator(this.properties[field].value)) {
+          callbacks.displayError({ message: "Invalid value supplied for field '" + field + "' of type '" + fields[field].type + "': " + this.properties[field].value });
         }
       } else {
         callbacks.displayError({ message: "No value supplied for field '" + field + "'" });
       }
-      if("formula" in properties[field] && !type.formulaValidator(properties[field].formula)) {
-        callbacks.displayError({ message: "Invalid formula supplied for field '" + field + "' of type '" + fields[field].type + "': " + properties[field].formula });
+      if("formula" in this.properties[field] && !type.formulaValidator(this.properties[field].formula)) {
+        callbacks.displayError({ message: "Invalid formula supplied for field '" + field + "' of type '" + fields[field].type + "': " + this.properties[field].formula });
       }
     }
     if(mode == "editor") {
@@ -210,9 +210,7 @@ $(document).ready(function(event) {
   objects.Scene.prototype.isContainer = true;
   objects.Scene.prototype.draw = function() {
     this.context.clearRect(0, 0, this.properties.canvasWidth.value, this.properties.canvasHeight.value);
-    for(var i = 0; i < this.children.length; i++) {
-      this.children[i].draw(this.context);
-    }
+    objects.Group.prototype.draw.apply(this, [this.context]);
   };
   objects.Scene.prototype.setWidth = function(width) {
     this.canvas.prop({ "width": width });
@@ -240,7 +238,9 @@ $(document).ready(function(event) {
   objects.Group.prototype.isContainer = true;
   objects.Group.prototype.draw = function(context) {
     for(var i = 0; i < this.children.length; i++) {
-      this.children[i].draw(context);
+      if("draw" in this.children[i]) {
+        this.children[i].draw(context);
+      }
     }
   };
 
@@ -253,11 +253,12 @@ $(document).ready(function(event) {
   objects.Box.prototype.type = "Box";
   objects.Box.prototype.fields = [ "name", "shapeWidth", "shapeHeight", "shapeBackgroundColor", "shapeLineColor", "x", "y" ];
   objects.Box.prototype.draw = function(context) {
-    context.rect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
+    context.beginPath();
     context.fillStyle = this.properties.shapeBackgroundColor.value;
-    context.fill();
     context.strokeStyle = this.properties.shapeLineColor.value;
     context.lineWidth = 1;
+    context.rect(this.properties.x.value, this.properties.y.value, this.properties.shapeWidth.value, this.properties.shapeHeight.value);
+    context.fill();
     context.stroke();
   };
 
@@ -275,7 +276,6 @@ $(document).ready(function(event) {
   objects.Player.prototype.type = "Player";
   objects.Player.prototype.fields = [ "name" ];
   objects.Player.prototype.isContainer = true;
-  objects.Player.prototype.draw = function(context) {};
 
   objects.Mouse = function(properties) {
     objects.Object.apply(this, [properties]);
@@ -285,7 +285,6 @@ $(document).ready(function(event) {
   objects.Mouse.prototype.constructor = objects.Mouse;
   objects.Mouse.prototype.type = "Mouse";
   objects.Mouse.prototype.fields = [ "name", "mouseX", "mouseY", "mouseClick" ];
-  objects.Mouse.prototype.draw = function(context) {};
 
   objects.Keyboard = function(properties) {
     objects.Object.apply(this, [properties]);
@@ -295,7 +294,6 @@ $(document).ready(function(event) {
   objects.Keyboard.prototype.constructor = objects.Keyboard;
   objects.Keyboard.prototype.type = "Keyboard";
   objects.Keyboard.prototype.fields = [ "name", "keyArrowUp", "keyArrowDown", "keyArrowLeft", "keyArrowRight", "keySpace" ];
-  objects.Keyboard.prototype.draw = function(context) {};
 
   buildLevel = function(data) {
     var object = new objects[data.type](data.properties);

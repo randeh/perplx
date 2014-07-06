@@ -32,7 +32,7 @@ $(document).ready(function(event) {
 
   callbacks.openEditor = function(data) {
     openEditor();
-    scene = new objects.Scene();
+    scene = new objects.Scene({});
     $("#editor-tree-list").append(scene.listItem);
     $("#editor-canvas-holder").append(scene.canvas);
   };
